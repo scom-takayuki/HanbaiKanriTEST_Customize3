@@ -154,6 +154,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Customize\販売\納品伝票\frmNouhin.designer.vb">
+      <DependentUpon>frmNouhin.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Customize\販売\納品伝票\frmNouhin.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\ApplicationEvents.vb" />
     <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\basMain.vb" />
     <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\basCommon.vb" />
@@ -507,12 +513,6 @@
     <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\CNouhin.vb" />
     <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\CNouhinDenpyouPrint.vb" />
     <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\CNouhinPrintSet.vb" />
-    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhin.Designer.vb">
-      <DependentUpon>frmNouhin.vb</DependentUpon>
-    </Compile>
-    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhin.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhinList.designer.vb">
       <DependentUpon>frmNouhinList.vb</DependentUpon>
     </Compile>
@@ -613,6 +613,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Customize\販売\納品伝票\frmNouhin.resx">
+      <DependentUpon>frmNouhin.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmDialog.resx">
       <DependentUpon>frmDialog.vb</DependentUpon>
     </EmbeddedResource>
@@ -843,9 +846,6 @@
     <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmYosanSuiiList.resx">
       <DependentUpon>frmYosanSuiiList.vb</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhin.resx">
-      <DependentUpon>frmNouhin.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhinList.resx">
       <DependentUpon>frmNouhinList.vb</DependentUpon>
@@ -1177,7 +1177,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Customize\販売\納品伝票\" />
     <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

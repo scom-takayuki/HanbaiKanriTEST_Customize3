@@ -18,8 +18,13 @@ Public Class frmNouhin
 
     Private defaultSoukoNo As Integer  'デフォルト倉庫がある場合、デフォルトの倉庫マスタNo
 
-    Private drDefaultShouhin As DataRow  '商品コード未入力時のデフォルトの商品
-    Private defaultShouhinNo As Integer
+    Private defaultShouhin As strctDefaultShouhin   '商品コード未入力時のデフォルトの商品
+    Private Structure strctDefaultShouhin
+        Dim MasterNo As Integer
+        Dim Code As String
+        Dim ZeiKubun As Byte
+        Dim TaxRateKubun As Byte
+    End Structure
 
     Private Denpyou As DenpyouDefine
 
@@ -381,8 +386,11 @@ Public Class frmNouhin
                     Me.ActiveControl = MRowSheet  'Form Load前ではFocusが効かないためActiveControlでセット
                     If MRowSheet.MRows(0)("入数").Value = 0 Then
                         MRowSheet.ActiveCellKey = "数量"    'セルの移動
+                        MRowSheet.MRows(0)("入数").CanActivate = False
+                        MRowSheet.MRows(0)("セット数").CanActivate = False
                     Else
                         MRowSheet.ActiveCellKey = "セット数"    'セルの移動
+                        MRowSheet.MRows(0)("入数").CanActivate = False
                     End If
                 End If
             End If
@@ -404,265 +412,6 @@ Public Class frmNouhin
             SetCursorDefault()
         End Try
     End Function
-
-#If SanOka Then
-    '*サンオカ*  出荷予定No（複数）から、新規登録画面を表示する（出荷予定表から、納品伝票作成を選んだ時）
-    Public Function FromShukkaYotei(ByVal lstShukkaYoteiNo As List(Of Integer)) As Boolean
-        SetCursorWait()
-        SheetRedrawOFF()
-        Try
-            SetInit()  '画面表示の初期設定
-
-            isNewInputtable = False  '新規伝票入力を不可とする（但し、得意先変更は可能とする）
-            isUpdated = False
-
-            Using cnTable As New SqlConnection(CSingleton.CSetting.Connect)
-                cnTable.Open()
-
-                '該当の出荷予定データを取得
-                Dim sqlIN As String = ""
-                For Each shukkaYoteiNo As Integer In lstShukkaYoteiNo
-                    sqlIN &= If(sqlIN <> "", ",", "") & shukkaYoteiNo.ToString("#0")
-                Next
-
-                Dim sSQL As String =
-                    "SELECT 出荷予定.テーブルNo, 出荷予定.商品名称, ISNULL(出荷予定.数量,0) AS 数量, " &
-                    "ISNULL(得意先マスタ.マスタNo,0) AS 得意先マスタNo, 得意先マスタ.コード AS 得意先コード, 得意先マスタ.名称, 得意先マスタ.名称カナ, 得意先マスタ.名称2, 得意先マスタ.敬称, 得意先マスタ.備考, 得意先マスタ.諸口フラグ, 得意先マスタ.請求先フラグ, 得意先マスタ.請求先マスタNo, " &
-                    "得意先マスタ.標準ﾌｫｰﾑ, 得意先マスタ.納品伝票フォーム, 得意先マスタ.納品伝票コード自動更新, 得意先マスタ.掛率, 得意先マスタ.端数, 得意先マスタ.税区分, 得意先マスタ.消費税計算方法, 得意先マスタ.伝票コードフラグ, 得意先マスタ.納品伝票項目数, 得意先マスタ.締日, 得意先マスタ.与信限度額, " &
-                    "請求先.標準ﾌｫｰﾑ AS 請求先標準ﾌｫｰﾑ, 請求先.納品伝票フォーム AS 請求先納品伝票フォーム, 請求先.納品伝票コード自動更新 AS 請求先納品伝票コード自動更新, 請求先.掛率 AS 請求先掛率, 請求先.端数 AS 請求先端数, 請求先.税区分 AS 請求先税区分, 請求先.消費税計算方法 AS 請求先消費税計算方法, 請求先.伝票コードフラグ AS 請求先伝票コードフラグ, 請求先.納品伝票項目数 AS 請求先納品伝票項目数, 請求先.締日 AS 請求先締日, 請求先.与信限度額 AS 請求先与信限度額, " &
-                    "CAST(ISNULL(納入先.得意先マスタNo,0) AS BIT) AS 納入先有無, " &
-                    "ISNULL(担当者マスタ.マスタNo,0) AS 得意先担当者マスタNo, 担当者マスタ.コード AS 担当者コード, 担当者マスタ.氏名 AS 担当者氏名, 担当者マスタ.氏名カナ AS 担当者氏名カナ, " &
-                    "ISNULL(商品マスタ.マスタNo,0) AS 商品マスタNo, 商品マスタ.コード AS 商品コード, 商品マスタ.名称カナ AS 商品名称カナ, 商品マスタ.単位 AS 商品単位, ISNULL(商品マスタ.税区分,0) AS 商品税区分, 商品マスタ.標準単価 AS 商品標準単価, 商品マスタ.仕入単価 AS 商品仕入単価, 商品マスタ.消費税率区分 AS 商品消費税率区分 " &
-                    "FROM 出荷予定 INNER JOIN 得意先マスタ ON 出荷予定.得意先マスタNo = 得意先マスタ.マスタNo " &
-                    "LEFT OUTER JOIN 得意先マスタ AS 請求先 ON 得意先マスタ.請求先マスタNo = 請求先.マスタNo " &
-                    "LEFT OUTER JOIN (SELECT 得意先マスタNo FROM 納入先マスタ GROUP BY 得意先マスタNo) AS 納入先 ON 得意先マスタ.マスタNo = 納入先.得意先マスタNo " &
-                    "LEFT OUTER JOIN 担当者マスタ ON 得意先マスタ.担当者マスタNo = 担当者マスタ.マスタNo " &
-                    "LEFT OUTER JOIN 商品マスタ ON 出荷予定.商品マスタNo = 商品マスタ.マスタNo " &
-                    "WHERE 出荷予定.テーブルNo IN(" & sqlIN & ") " &
-                    "ORDER BY 出荷予定.出荷日行番号"
-                Dim dtShukka As DataTable = CDBCommon.GetDataTable(cnTable, sSQL)
-                If CDBCommon.DBError OrElse dtShukka.Rows.Count <= 0 Then
-                    MessageBox.Show("該当する出荷予定データが見つかりません。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    Return False
-                End If
-                Dim drShukka As DataRow = dtShukka.Rows(0)
-
-                If drShukka("得意先マスタNo") <= 0 Then
-                    MessageBox.Show("得意先が入力されていない出荷予定データは、参照できません。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    Return False
-                End If
-
-                '伝票クリア
-                InitDenpyou()
-
-                '1件目の出荷予定データから納品伝票部を作成（Denpyouにセット）
-                With Denpyou
-                    .SeikyuDate = Date.Today
-                    .NouhinDate = Date.Today
-
-                    Dim CShouhiZei As New HanbaikanriDialog.CShouhiZei()
-                    .aryRate = CShouhiZei.GetRate2(cnTable, Denpyou.SeikyuDate)  '消費税率1,2取得
-                    oldAryRate = Denpyou.aryRate
-
-                    With .Tokuisaki
-                        .MasterNo = drShukka("得意先マスタNo")
-                        .Code = drShukka("得意先コード").ToString
-                        .Name = drShukka("名称").ToString
-                        .Name2 = drShukka("名称2").ToString
-                        .Keishou = drShukka("敬称").ToString
-                        .NameKana = drShukka("名称カナ").ToString
-                        .Bikou = drShukka("備考").ToString
-                        .Shokuchi = GetBoolean(drShukka("諸口フラグ"))
-                        .NounyusakiExist = drShukka("納入先有無")
-
-                        If GetBoolean(drShukka("請求先フラグ")) Then
-                            .SeikyuSaki = drShukka("請求先マスタNo")
-                            .Kakeritu = GetDecimal(drShukka("請求先掛率"))
-                            .Hyoujun = drShukka("請求先標準ﾌｫｰﾑ")
-                            .DenpyouCodeFlag = GetBoolean(drShukka("請求先伝票コードフラグ"))
-                            .Simebi = GetShort(drShukka("請求先締日"))
-                            .YosinGendo = GetDecimal(drShukka("請求先与信限度額"))
-
-                            .ZeiKubun = GetByte(drShukka("請求先税区分"))
-                            .ShouhizeiKeisan = GetShort(drShukka("請求先消費税計算方法"))
-                            .Hasuu = GetShort(drShukka("請求先端数"))
-
-                            If .Hyoujun = False Then
-                                If Denpyou.Tokuisaki.DenpyouCodeFlag Then
-                                    Denpyou.Tokuisaki.DenpyouCodeUpdate = GetBoolean(drShukka("請求先納品伝票コード自動更新"))
-                                End If
-                                Denpyou.NouhinDenpyou = drShukka("請求先納品伝票フォーム").ToString
-                                Denpyou.KoumokuSu = GetInt(drShukka("請求先納品伝票項目数"))
-                            End If
-                            If Denpyou.KoumokuSu = 0 Then
-                                Denpyou.KoumokuSu = MaxKoumoku
-                            End If
-                            Denpyou.Code = GetDenpyouCode(Denpyou.Tokuisaki.SeikyuSaki).ToString(New String("0", drJisha("納品伝票コード桁数")))
-                            Denpyou.NewCode = CDec(Denpyou.Code)
-
-                        Else
-                            .SeikyuSaki = drShukka("得意先マスタNo")
-                            .Kakeritu = GetDecimal(drShukka("掛率"))
-                            .Hyoujun = GetBoolean(drShukka("標準ﾌｫｰﾑ"))
-                            .DenpyouCodeFlag = GetBoolean(drShukka("伝票コードフラグ"))
-                            .Simebi = GetShort(drShukka("締日"))
-                            .YosinGendo = GetDecimal(drShukka("与信限度額"))
-
-                            .ZeiKubun = GetByte(drShukka("税区分"))
-                            .ShouhizeiKeisan = GetShort(drShukka("消費税計算方法"))
-                            .Hasuu = GetShort(drShukka("端数"))
-
-                            If .Hyoujun = False Then
-                                If Denpyou.Tokuisaki.DenpyouCodeFlag Then
-                                    Denpyou.Tokuisaki.DenpyouCodeUpdate = GetBoolean(drShukka("納品伝票コード自動更新"))
-                                End If
-                                Denpyou.NouhinDenpyou = drShukka("納品伝票フォーム").ToString
-                                Denpyou.KoumokuSu = GetInt(drShukka("納品伝票項目数"))
-                            End If
-                            If Denpyou.KoumokuSu = 0 Then
-                                Denpyou.KoumokuSu = MaxKoumoku
-                            End If
-                            Denpyou.Code = GetDenpyouCode(Denpyou.Tokuisaki.SeikyuSaki).ToString(New String("0", drJisha("納品伝票コード桁数")))
-                            Denpyou.NewCode = CDec(Denpyou.Code)
-                        End If
-                    End With
-
-                    ''指定伝票かどうかを判定
-                    'If CNouhin.CNouhinInstance.ChkSiteiDenpyou(Denpyou.NouhinDenpyou) Then
-                    '    '指定伝票なら、納品伝票を終了し指定伝票の受注参照へ
-                    '    isEnd = True  '終了
-                    '    CNouhin.CNouhinInstance.TokuisakiNo = 0
-                    '    CNouhin.CNouhinInstance.TableNo = 0
-                    '    CNouhin.CNouhinInstance.JutyuNo = tableNo
-                    '    CNouhin.CNouhinInstance.MitumoriNo = 0
-                    '    Me.DialogResult = DialogResult.OK  '結果を渡す
-                    '    Me.Close()
-                    '    Return 0  '指定伝票
-                    'End If
-
-                    '得意先マスタの担当者があればセット
-                    If drShukka("得意先担当者マスタNo") > 0 Then
-                        .Tantousha.MasterNo = drShukka("得意先担当者マスタNo")
-                        .Tantousha.Code = drShukka("担当者コード").ToString
-                        .Tantousha.Name = drShukka("担当者氏名").ToString
-                        .Tantousha.NameKana = drShukka("担当者氏名カナ").ToString
-                    End If
-
-                    If Denpyou.KoumokuSu < dtShukka.Rows.Count Then
-                        Denpyou.KoumokuSu = dtShukka.Rows.Count
-                    End If
-                End With
-
-                '納品伝票、納品明細の新規DataSetを作成
-                MakeEditCommandsDenpyou(cnTable, 0)  'テーブルNo=0でSelect
-
-                '納品伝票DataTableに空で追加
-                Dim rowNewDenpyou As DataRow = dtDenpyou.NewRow  '行を生成
-                dtDenpyou.Rows.Add(rowNewDenpyou)  '行をDataTableに追加
-
-                '出荷予定データから納品明細DataTableに追加
-                '　出荷予定データは得意先、商品（商品コード無しもあり）、数量のみ。金額は持っていないため、ここで計算して付加する。
-                Dim rowNewMeisai As DataRow
-                For iRow As Integer = 0 To dtShukka.Rows.Count - 1
-                    drShukka = dtShukka.Rows(iRow)
-
-                    rowNewMeisai = dtMeisai.NewRow  '行を生成
-
-                    rowNewMeisai("テーブルNo") = 0
-                    rowNewMeisai("納品伝票No") = rowNewDenpyou("テーブルNo")  '納品明細の納品伝票Noに納品伝票のテーブルNoをセット
-                    rowNewMeisai("行番号") = iRow + 1
-                    If My.Settings.HanbaiKanriType = "C" Then
-                        rowNewMeisai("受注明細No") = 0
-                    End If
-                    rowNewMeisai("出荷予定No") = drShukka("テーブルNo")  '出荷予定TBLと連動させる
-                    rowNewMeisai("備考") = ""
-
-                    rowNewMeisai("商品マスタNo") = drShukka("商品マスタNo")
-                    rowNewMeisai("商品税区分") = GetByte(drShukka("商品税区分"))
-                    rowNewMeisai("商品コード") = drShukka("商品コード").ToString
-                    rowNewMeisai("商品名称カナ") = drShukka("商品名称カナ").ToString
-                    rowNewMeisai("商品名称") = drShukka("商品名称").ToString  '手入力した出荷予定データから
-                    rowNewMeisai("入数") = 0  '入数無し
-                    rowNewMeisai("セット数") = 0
-                    rowNewMeisai("数量") = drShukka("数量")  '出荷予定データから
-                    rowNewMeisai("単位") = drShukka("商品単位").ToString
-
-                    Dim shouhizeiRituKubun As Byte = GetByte(drShukka("商品消費税率区分"), enTaxRateKubun.税率1)
-
-                    Dim taxRate As Tuple(Of Decimal, Boolean) = CDenpyouCommon.GetTaxRate(Denpyou.Tokuisaki.ZeiKubun, drShukka("商品税区分"), Denpyou.SeikyuDate, Denpyou.aryRate, shouhizeiRituKubun)
-                    rowNewMeisai("消費税率") = taxRate.Item1
-                    rowNewMeisai("軽減税率") = taxRate.Item2
-
-                    rowNewMeisai("税抜原価単価") = 0
-                    rowNewMeisai("税込原価単価") = 0
-                    rowNewMeisai("税抜商品単価") = 0
-                    rowNewMeisai("税込商品単価") = 0
-                    rowNewMeisai("税抜原価") = 0
-                    rowNewMeisai("税抜金額") = 0
-                    rowNewMeisai("税込金額") = 0
-                    rowNewMeisai("消費税") = 0
-
-                    If drShukka("商品マスタNo") > 0 Then
-                        '原価単価を取得
-                        Dim genkatanka As CDenpyouCommon.strctZeinukiZeikomi = CDenpyouCommon.GetGenkaTanka(drShukka("商品仕入単価"), drShukka("商品税区分"), Denpyou.Tokuisaki.ZeiKubun, Denpyou.Tokuisaki.Hasuu, GetByte(drJisha("買掛単価少数桁数")), rowNewMeisai("消費税率"), Denpyou.aryRate(shouhizeiRituKubun - 1))
-                        rowNewMeisai("税抜原価単価") = genkatanka.ZeinukiGaku
-                        rowNewMeisai("税込原価単価") = genkatanka.ZeikomiGaku
-
-                        '商品単価を取得
-                        Dim shouhintanka As CDenpyouCommon.strctZeinukiZeikomi = CDenpyouCommon.GetUriageTanka(drShukka("商品マスタNo"), drShukka("商品標準単価"), Denpyou.Tokuisaki.SeikyuSaki, drShukka("商品税区分"), Denpyou.Tokuisaki.ZeiKubun, Denpyou.Tokuisaki.Kakeritu, Denpyou.Tokuisaki.Hasuu, GetByte(drJisha("売掛単価少数桁数")), rowNewMeisai("消費税率"), Denpyou.aryRate(shouhizeiRituKubun - 1))
-                        rowNewMeisai("税抜商品単価") = shouhintanka.ZeinukiGaku
-                        rowNewMeisai("税込商品単価") = shouhintanka.ZeikomiGaku
-                        Dim tanka As Decimal = shouhintanka.Kingaku
-
-                        If rowNewMeisai("数量") <> 0 Then
-                            '原価金額を計算
-                            If rowNewMeisai("税抜原価単価") <> 0 Then
-                                rowNewMeisai("税抜原価") = CDenpyouCommon.GetCalcGenkaKingaku(rowNewMeisai("税抜原価単価"), rowNewMeisai("数量"), Denpyou.Tokuisaki.Hasuu)
-                            End If
-
-                            '金額/消費税を計算
-                            If rowNewMeisai("税抜商品単価") <> 0 Then
-                                Dim kingaku As CDenpyouCommon.strctZeinukiZeikomi = CDenpyouCommon.GetCalcKingaku(tanka, rowNewMeisai("数量"), drShukka("商品税区分"), Denpyou.Tokuisaki.ZeiKubun, Denpyou.Tokuisaki.Hasuu, rowNewMeisai("消費税率"),,, Denpyou.Tokuisaki.ShouhizeiKeisan)
-                                rowNewMeisai("税抜金額") = kingaku.ZeinukiGaku
-                                rowNewMeisai("税込金額") = kingaku.ZeikomiGaku
-                                rowNewMeisai("消費税") = kingaku.ShouhizeiGaku  '（明細毎以外は、小数点以下4桁まで保持）
-                            End If
-                        End If
-                    End If
-
-                    dtMeisai.Rows.Add(rowNewMeisai)  '行をDataTableに追加
-                Next
-            End Using
-
-            isSearchedDenpyou = False
-
-            MRowSheet.Enabled = True
-            SetForm(True, False, True)
-            SetGoukei()
-            UpdateFlagOn()
-            Me.Text = TITLE & "（新規）"
-            lblShusei.Visible = False
-            edtTantouCode.Select()
-
-            isEnd = False
-
-            '画面表示
-            SheetRedrawON()
-            SetCursorDefault()
-            Me.ShowDialog()
-
-            Return isUpdated  '伝票を更新した時、Trueを返す
-
-        Catch ex As Exception
-            ErrProc(ex, Me.Text)
-            Return False
-
-        Finally
-            SheetRedrawON()
-            SetCursorDefault()
-        End Try
-    End Function
-#End If
 
     '指定伝票対応処理
     '納品伝票No又は受注参照時の受注伝票No又は見積参照時の見積書Noを指定し、納品伝票登録の修正or複写or受注参照or見積参照画面を表示
@@ -784,7 +533,6 @@ Public Class frmNouhin
             CFormCommon.SettingFormSize(Me, Me.GetType().Name)  '画面サイズ保存/復元の共通設定
         End If
         'CFormCommon.SetBtnUpdateEnabledEvent(Nothing, toolBtnUpdate)  '更新ボタンの有効設定イベントの登録
-        CFormCommon.SetRemoveCrLfEvent(Nothing)  '複数行不可のテキストコントロールに改行コード除去イベントを登録
 
         'Idleイベントの設定（ボタン２度押し防止のため使用）
         AddHandler Application.Idle, New EventHandler(AddressOf Application_Idle)
@@ -868,6 +616,12 @@ Public Class frmNouhin
             toolBtnDeleteRow.Text = "行下げ" & vbCrLf & "(&B)"
             toolBtnDeleteRow.Image = My.Resources.arrow_189_16_307EA9
             toolBtnDeleteRow.ToolTipText = "選択した行を下に移動します"
+
+            If My.Settings.EndUserName = "信和通信工業株式会社" Then
+                '*信和*  領収書/プレビューを切り替える
+                toolBtnRyoushuSho.Text = "領収ﾌﾟﾚ" & vbCrLf & "(&R)"
+                toolBtnRyoushuSho.Image = My.Resources.paper_16_307EA9
+            End If
         Else
             'Shiftキーを離した時
             toolBtnInsertRow.Text = "行挿入" & vbCrLf & "(&A)"
@@ -877,6 +631,12 @@ Public Class frmNouhin
             toolBtnDeleteRow.Text = "行削除" & vbCrLf & "(&B)"
             toolBtnDeleteRow.Image = My.Resources.delete_row_16_307EA9
             toolBtnDeleteRow.ToolTipText = "明細から、１行削除します"
+
+            If My.Settings.EndUserName = "信和通信工業株式会社" Then
+                '*信和*  領収書/プレビューを切り替える
+                toolBtnRyoushuSho.Text = "領収書" & vbCrLf & "(&R)"
+                toolBtnRyoushuSho.Image = My.Resources.printer_16_307EA9
+            End If
         End If
     End Sub
 
@@ -900,12 +660,15 @@ Public Class frmNouhin
 
         'デフォルト商品を得る（商品コード未入力時の自動セットで使用）
         Dim CShouhin As New HanbaikanriDialog.CShouhin
-        drDefaultShouhin = CShouhin.GetMaster(GetInt(drJisha("商品デフォルトNo")))
-        If drDefaultShouhin Is Nothing Then
-            defaultShouhinNo = 0
+        Dim drShouhin As DataRow = CShouhin.GetMaster(GetInt(drJisha("商品デフォルトNo")))
+        If drShouhin Is Nothing Then
+            defaultShouhin.MasterNo = 0
             MessageBox.Show("デフォルト商品が登録されていません。" & vbCrLf & "納品伝票画面を閉じ、自社情報のデフォルト商品コードを登録してください。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
         Else
-            defaultShouhinNo = drDefaultShouhin("マスタNo")
+            defaultShouhin.MasterNo = drShouhin("マスタNo")
+            defaultShouhin.Code = drShouhin("コード").ToString
+            defaultShouhin.ZeiKubun = drShouhin("税区分")
+            defaultShouhin.TaxRateKubun = drShouhin("消費税率区分")
         End If
 
         '日付項目の未入力不可イベントの登録
@@ -927,6 +690,11 @@ Public Class frmNouhin
             Denpyou.NewCode = drJisha("納品伝票現コード")
         Else
             Denpyou.NewCode = GetDenpyouCode(0)
+        End If
+
+        If My.Settings.EndUserName = "信和通信工業株式会社" Then
+            '*信和*　明細行のデフォルトMax行数を6とする
+            MaxKoumoku = 6
         End If
 
         SetInitForm()  '画面の初期設定
@@ -971,6 +739,24 @@ Public Class frmNouhin
         '摘要
         CFormCommon.IniCtrlTextMultiLine(edtTekiyou, 255)
 
+        '*信和*　但し書き
+        If My.Settings.EndUserName = "信和通信工業株式会社" Then
+            edtLblTadasiGaki.Visible = True
+            edtTadasiGaki.Visible = True
+
+            CFormCommon.IniCtrlText(edtTadasiGaki, 100)
+        Else
+            edtLblTadasiGaki.Visible = False
+            edtTadasiGaki.Visible = False
+        End If
+
+        '*信和*　仮伝票
+        If My.Settings.EndUserName = "信和通信工業株式会社" Then
+            chkKariDen.Visible = True
+        Else
+            chkKariDen.Visible = False
+        End If
+
         '納品伝票印刷のToolStripメニュー設定
         '　納品伝票フォームのコンボボックス作成（自社情報の納品伝票フォームと、納品伝票フォルダから作成）
         Dim formFolder As String = PrintFormFolderMirrorPrincipal(CSingleton.CSetting.PrintFormFolder) & "\納品伝票"
@@ -978,17 +764,8 @@ Public Class frmNouhin
         '　納品伝票プリンタのコンボボックス作成
         CFormCommon.MakeComboBoxPrinter(mnuCmbPrinter)
 
-        '*信和*　仮伝票、但し書き、領収書ボタン、領収書印刷のToolStripメニュー設定
+        '*信和*　領収書印刷のToolStripメニュー設定
         If My.Settings.EndUserName = "信和通信工業株式会社" Then
-            chkKariDen.Visible = True
-            sheetGoukei.Height -= 25  '合計シートを3行から2行に変更し、但し書きを表示
-            edtLblTadasiGaki.Visible = True
-            edtTadasiGaki.Visible = True
-            CFormCommon.IniCtrlText(edtTadasiGaki, 100)
-
-            btnPrintRyoushuSho.Visible = True
-            btnPreviewRyoushuSho.Visible = True
-
             mnuLblFormRyoushuSho.Visible = True
             mnuCmbFormRyoushuSho.Visible = True
             mnuLblPrinterRyoushuSho.Visible = True
@@ -1005,11 +782,6 @@ Public Class frmNouhin
             '領収書プリンタのコンボボックス作成
             CFormCommon.MakeComboBoxPrinter(mnuCmbPrinterRyoushuSho)
         Else
-            chkKariDen.Visible = False
-            edtLblTadasiGaki.Visible = False
-            edtTadasiGaki.Visible = False
-            btnPrintRyoushuSho.Visible = False
-            btnPreviewRyoushuSho.Visible = False
             mnuLblFormRyoushuSho.Visible = False
             mnuCmbFormRyoushuSho.Visible = False
             mnuLblPrinterRyoushuSho.Visible = False
@@ -1067,6 +839,19 @@ Public Class frmNouhin
             toolSepaJutyu.Visible = False
             mnuJutyu.Visible = False
         End If
+        If My.Settings.EndUserName = "信和通信工業株式会社" Then
+            '*信和*　「領収書」ボタンあり
+            toolBtnRyoushuSho.Visible = True
+            toolSepaRyoushuSho.Visible = True
+        Else
+            toolBtnRyoushuSho.Visible = False
+            toolSepaRyoushuSho.Visible = False
+        End If
+        If My.Settings.EndUserName = "株式会社　日の出" Then
+            '*日の出*　「印刷」「プレビュー」ボタンを緑に
+            toolBtnPrint.BackColor = Color.LightGreen
+            toolBtnPreview.BackColor = Color.LightGreen
+        End If
 
         If isWhenCopy Then  '「コピー」時は、画面サイズの保存と復元をしない（コピー時に画面位置を復元すると、カーソル位置に表示できず、コピー元の画面と重なってしまう）
             mnuResetForm.Visible = False
@@ -1078,18 +863,20 @@ Public Class frmNouhin
         toolBtnNextNew.ToolTipText = "同じ得意先で、新規伝票を入力します"
         toolBtnInsertRow.ToolTipText = "明細に、１行挿入します（選択行の上に挿入）"
         toolBtnDeleteRow.ToolTipText = "明細から、１行削除します"
-        toolBtnCopyRow.ToolTipText = "選択行を下に複写し追加します"
         toolBtnDelete.ToolTipText = "伝票を削除します"
         toolBtnSearch.ToolTipText = "納品伝票を検索します"
         toolBtnSearchCopy.ToolTipText = "既存の納品伝票を検索し、内容を複写し新規の納品伝票を作成します"
         toolBtnPrint.ToolTipText = "納品伝票を印刷します"
         toolBtnPreview.ToolTipText = "納品伝票を印刷プレビューします"
+        If My.Settings.EndUserName = "信和通信工業株式会社" Then
+            toolBtnRyoushuSho.ToolTipText = "領収書を印刷します。" & vbCrLf & "Shiftキーを押しながら押すと、領収書を印刷プレビューします。"
+        End If
         toolBtnUpdate.ToolTipText = "入力データを登録/更新します"
         toolBtnCopyNew.ToolTipText = "表示中の内容を、別画面にコピーします"
         toolBtnTankaRireki.ToolTipText = "選択行の商品の、単価履歴一覧を表示します"
-        toolBtnMitumori.ToolTipText = "見積書を参照し、新規納品伝票を作成します"
-        toolBtnJutyu.ToolTipText = "受注伝票を参照し、新規納品伝票を作成します"
-        toolBtnSiire.ToolTipText = "仕入伝票を参照し、新規納品伝票を作成します" & vbCrLf & "（得意先入力後に参照可）"
+        toolBtnMitumori.ToolTipText = "見積書を参照入力します"
+        toolBtnJutyu.ToolTipText = "受注伝票を参照入力します"
+        toolBtnSiire.ToolTipText = "仕入伝票を参照入力します"
         toolBtnExpandMeisai.ToolTipText = "明細行の表示を縦に伸ばします⇔縮めます"
         toolBtnExport.ToolTipText = "表示中の内容をエクスポートします"
         toolBtnEnd.ToolTipText = "終了します"
@@ -1099,12 +886,7 @@ Public Class frmNouhin
         toolTipMsg.SetToolTip(btnSearchSouko, "倉庫一覧を表示します")
         toolTipMsg.SetToolTip(btnSearchTantou, "担当者一覧を表示します")
         toolTipMsg.SetToolTip(btnClearReferenceCode, "参照情報をクリアします")
-        toolTipMsg.SetToolTip(lblTekiyou, "改行は[Ctrl]+[Enter]")
-        If My.Settings.EndUserName = "信和通信工業株式会社" Then
-            '*信和*　領収書ボタンあり
-            toolTipMsg.SetToolTip(btnPrintRyoushuSho, "領収書を印刷します")
-            toolTipMsg.SetToolTip(btnPreviewRyoushuSho, "領収書を印刷プレビューします")
-        End If
+        toolTipMsg.SetToolTip(lblTekiyou, "改行は[Ctlr]+[Enter]")
 
         'インフォメーション(i)のバルーンチップ設定（伝票の更新情報は画面右上のインフォメーション画像クリックで表示し、明細の更新情報は行ヘッダ右クリックで表示する）
         CFormCommon.IniBalloonTipInformation(picInfo, myBalloonTip, myBalloonTipInfo, lblTitle.Text & "情報")
@@ -1178,10 +960,6 @@ Public Class frmNouhin
         If My.Settings.EndUserName = "田中コルク工業株式会社" Then
             '*田中コルク*　商品名称の幅を広げるため、名称カナを広げる
             mRowTemplate.Cells.SetColumnWidth(enSheetCol1.商品名称カナ, mRowTemplate.Cells.GetColumnWidth(enSheetCol1.商品名称カナ) + 65)
-        ElseIf My.Settings.EndUserName = "株式会社サンオカ" OrElse
-               My.Settings.EndUserName = "信和通信工業株式会社" Then
-            '*サンオカ* *信和*　商品名称の幅を広げるため、名称カナを広げる
-            mRowTemplate.Cells.SetColumnWidth(enSheetCol1.商品名称カナ, mRowTemplate.Cells.GetColumnWidth(enSheetCol1.商品名称カナ) + 50)
         End If
 
         '  <商品名称> 
@@ -1206,12 +984,14 @@ Public Class frmNouhin
         CFormCommon.IniCtrlNumber(mRowTemplate.Cells(enSheetCol1.入数, enSheetRow.Row1).Editor, 6, CInt(GetByte(drJisha("売掛数量少数桁数"))), False)
         CFormCommon.IniCtrlNumber(mRowTemplate.Cells(enSheetCol2.数量, enSheetRow.Row2).Editor, 6, CInt(GetByte(drJisha("売掛数量少数桁数"))), False)
         If My.Settings.EndUserName = "信和通信工業株式会社" _
+          OrElse My.Settings.EndUserName = "株式会社　日の出" _
           OrElse My.Settings.EndUserName = "株式会社　山松" Then
             mRowTemplate.Cells(enSheetCol1.入数, enSheetRow.Row1).TabStop = False
         End If
         If My.Settings.EndUserName = "株式会社サンオカ" Then
             '*サンオカ*　入数/セット数を使用しない（表示しない）
-            mRowTemplate.Cells(enSheetCol1.入数, enSheetRow.Row1).Enabled = False  '使用不可
+            mRowTemplate.Cells(enSheetCol1.入数, enSheetRow.Row1).Lock = True  '編集禁止
+            mRowTemplate.Cells(enSheetCol1.入数, enSheetRow.Row1).TabStop = False
             CFormCommon.IniCtrlNumber(mRowTemplate.Cells(enSheetCol1.入数, enSheetRow.Row1).Editor, 6, CInt(GetByte(drJisha("売掛数量少数桁数"))), False, blankWhenZero)  '値がゼロならスペースを表示でゼロを表示させないようにする
             mRowTemplate.ColumnHeaders.Merge(New GrapeCity.Win.ElTabelle.TRange(enSheetCol1.入数, enSheetRow.Row1, enSheetCol1.入数, enSheetRow.Row2))
             mRowTemplate.ColumnHeaders(enSheetCol1.入数, enSheetRow.Row1).Caption = "数量"
@@ -1220,12 +1000,14 @@ Public Class frmNouhin
         '  <セット数>
         CFormCommon.IniCtrlNumber(mRowTemplate.Cells(enSheetCol1.セット数, enSheetRow.Row1).Editor, 6, 0, False)
         If My.Settings.EndUserName = "信和通信工業株式会社" _
+          OrElse My.Settings.EndUserName = "株式会社　日の出" _
           OrElse My.Settings.EndUserName = "株式会社　山松" Then
             mRowTemplate.Cells(enSheetCol1.セット数, enSheetRow.Row1).TabStop = False
         End If
         If My.Settings.EndUserName = "株式会社サンオカ" Then
             '*サンオカ*　入数/セット数を使用しない（表示しない）
-            mRowTemplate.Cells(enSheetCol1.セット数, enSheetRow.Row1).Enabled = False  '編集禁止
+            mRowTemplate.Cells(enSheetCol1.セット数, enSheetRow.Row1).Lock = True  '編集禁止
+            mRowTemplate.Cells(enSheetCol1.セット数, enSheetRow.Row1).TabStop = False
             CFormCommon.IniCtrlNumber(mRowTemplate.Cells(enSheetCol1.セット数, enSheetRow.Row1).Editor, 6, 0, False, blankWhenZero)
             mRowTemplate.ColumnHeaders.Merge(New GrapeCity.Win.ElTabelle.TRange(enSheetCol1.セット数, enSheetRow.Row1, enSheetCol1.セット数, enSheetRow.Row2))
             mRowTemplate.ColumnHeaders(enSheetCol1.セット数, enSheetRow.Row1).Caption = "単位"
@@ -1244,6 +1026,7 @@ Public Class frmNouhin
         '  <原価単価>
         CFormCommon.IniCtrlNumber(mRowTemplate.Cells(enSheetCol1.原価単価, enSheetRow.Row1).Editor, 9, CInt(GetByte(drJisha("買掛単価少数桁数"))), False, blankWhenZero)
         If My.Settings.EndUserName = "信和通信工業株式会社" _
+          OrElse My.Settings.EndUserName = "株式会社　日の出" _
           OrElse My.Settings.EndUserName = "株式会社　山松" Then
             mRowTemplate.Cells(enSheetCol1.原価単価, enSheetRow.Row1).TabStop = False
         End If
@@ -1259,9 +1042,6 @@ Public Class frmNouhin
         ''''mRowTemplate.Cells(enSheetCol1.備考, enSheetRow.Row1).Font = New System.Drawing.Font("ＭＳ ゴシック", MRowSheet.Font.Size)
         If My.Settings.EndUserName = "信和通信工業株式会社" Then
             mRowTemplate.Cells(enSheetCol1.備考, enSheetRow.Row1).TabStop = False
-        ElseIf My.Settings.EndUserName = "株式会社サンオカ" Then
-            '*サンオカ*　商品名称の幅を広げた分、備考を狭く
-            mRowTemplate.Cells.SetColumnWidth(enSheetCol1.備考, mRowTemplate.Cells.GetColumnWidth(enSheetCol1.備考) - 50)
         End If
 
         '入力最終列より後ろの列を表示しない
@@ -1279,10 +1059,10 @@ Public Class frmNouhin
 
 
         '*** MultiRowの設定（共通初期設定以外の設定） ***
-        'If My.Settings.EndUserName = "株式会社　日の出" Then
-        '    '日の出は、セルのハイライトを個別に設定するため、ここでの設定をしない
-        '    MRowSheet.HighlightEditText = False
-        'End If
+        If My.Settings.EndUserName = "株式会社　日の出" Then
+            '日の出は、セルのハイライトを個別に設定するため、ここでの設定をしない
+            MRowSheet.HighlightEditText = False
+        End If
     End Sub
 
     '合計シートの初期設定
@@ -1345,9 +1125,9 @@ Public Class frmNouhin
 
     'メニュー項目（ToolStripButton、ToolStripMenu）押下時の処理
     Private Sub toolBtn_Click(ByVal sender As Object, ByVal e As EventArgs) Handles toolBtnNew.Click, mnuNew.Click, toolBtnNextNew.Click, mnuNextNew.Click,
-            toolBtnInsertRow.Click, mnuInsertRow.Click, toolBtnDeleteRow.Click, mnuDeleteRow.Click, mnuRowUp.Click, mnuRowDown.Click, toolBtnCopyRow.Click, mnuCopyRow.Click,
+            toolBtnInsertRow.Click, mnuInsertRow.Click, toolBtnDeleteRow.Click, mnuDeleteRow.Click, mnuRowUp.Click, mnuRowDown.Click,
             toolBtnDelete.Click, mnuDelete.Click, toolBtnSearch.Click, mnuSearch.Click, toolBtnSearchCopy.Click, mnuSearchCopy.Click,
-            toolBtnPrint.Click, mnuPrint.Click, toolBtnPreview.Click, mnuPreview.Click, mnuPrintRyoushuSho.Click, mnuPreviewRyoushuSho.Click,
+            toolBtnPrint.Click, mnuPrint.Click, toolBtnPreview.Click, mnuPreview.Click, toolBtnRyoushuSho.Click, mnuPrintRyoushuSho.Click, mnuPreviewRyoushuSho.Click,
             toolBtnUpdate.Click, mnuUpdate.Click, toolBtnCopyNew.Click, mnuCopyNew.Click, toolBtnTankaRireki.Click, mnuTankaRireki.Click,
             toolBtnMitumori.Click, mnuMitumori.Click, toolBtnJutyu.Click, mnuJutyu.Click, toolBtnSiire.Click, mnuSiire.Click, toolBtnExpandMeisai.Click, mnuExpandMeisai.Click,
             toolBtnExport.Click, mnuExport.Click,
@@ -1436,18 +1216,6 @@ Public Class frmNouhin
                     End If
                 End If
 
-            ElseIf sender Is toolBtnCopyRow OrElse sender Is mnuCopyRow Then
-                '「行コピー」、[編集]-[行コピー]：明細行のコピー
-                If originalPosition.IsEmpty = False Then
-                    If CopyRow(originalPosition) Then
-                        MRowSheet.Select()
-                        MRowSheet.ActivePosition = New GrapeCity.Win.ElTabelle.MPosition(originalPosition.MRow + 1, originalPosition.Column, originalPosition.Row)
-                    Else
-                        MRowSheet.Select()
-                        MRowSheet.ActivePosition = originalPosition  'シートのActivePositionを元に戻す
-                    End If
-                End If
-
             ElseIf sender Is toolBtnDelete OrElse sender Is mnuDelete Then
                 '「伝票削除」、[ファイル]-[削除]：伝票削除（削除フラグを立てる）
                 DeleteRecord()
@@ -1472,6 +1240,18 @@ Public Class frmNouhin
             ElseIf sender Is toolBtnPreview OrElse sender Is mnuPreview Then
                 '「プレビュー」、[納品伝票印刷]-[プレビュー]
                 PrintDenpyou(True)
+
+            ElseIf sender Is toolBtnRyoushuSho Then
+                '「領収書」：領収書　印刷/プレビュー（信和通信のみ）
+                If (Control.ModifierKeys And Keys.Shift) = Keys.Shift Then  'Shiftキー押下時
+                    PrintRyoushuSho(True)   '領収書　プレビュー
+
+                    'ボタン表示を元に戻す（Shiftキーを押しながら領収書ボタンを押すと、KeyUpイベントが発生しないため）
+                    toolBtnRyoushuSho.Text = "領収書" & vbCrLf & "(&R)"
+                    toolBtnRyoushuSho.Image = My.Resources.printer_16_307EA9
+                Else
+                    PrintRyoushuSho(False)  '領収書　印刷
+                End If
 
             ElseIf sender Is mnuPrintRyoushuSho Then
                 '[納品伝票印刷]-[領収書印刷]
@@ -1563,18 +1343,6 @@ Public Class frmNouhin
         SetCursorDefault()
     End Sub
 
-    '*信和*　「領収書」「プレビュー」
-    Private Sub btnRyoushuSho_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnPrintRyoushuSho.Click, btnPreviewRyoushuSho.Click
-        If _IsEventProcessing Then Exit Sub Else _IsEventProcessing = True 'イベント処理中は処理しない（ボタンの２度押し防止のため）
-        SetCursorWait()
-        If sender Is btnPrintRyoushuSho Then
-            PrintRyoushuSho(False)  '領収書　印刷
-        Else
-            PrintRyoushuSho(True)   '領収書　プレビュー
-        End If
-        SetCursorDefault()
-    End Sub
-
     '得意先コード「検索」ボタンを押した時、得意先の一覧を表示し、選択した得意先の項目を得る
     Private Sub btnSearchTokui_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnSearchTokui.Click
         SetCursorWait()
@@ -1583,7 +1351,7 @@ Public Class frmNouhin
             isChangedTokuiCode = False
 
             'カーソル移動の制御
-            If My.Settings.EndUserName = "有限会社江東高周波工業" Then
+            If My.Settings.EndUserName = "江東高周波工業" Then
                 '*江東高周波*  得意先入力後、商品名カナにカーソル移動させる
                 MRowSheet.Select()
                 MRowSheet.ActivePosition = New GrapeCity.Win.ElTabelle.MPosition(0, enSheetCol1.商品名称カナ, enSheetRow.Row1)
@@ -1683,7 +1451,7 @@ Public Class frmNouhin
             '入力されたコードorカナに合致するマスタ一覧からコードを得る（１件しかない時は、一覧を表示せずそのデータを得る）
             If FindTokuisaki(False) Then
                 'カーソル移動の制御（Leaveの中でTabStopを設定しても効かない）
-                If My.Settings.EndUserName = "有限会社江東高周波工業" Then
+                If My.Settings.EndUserName = "江東高周波工業" Then
                     '*江東高周波*  得意先入力後、商品名カナにカーソル移動させる
                     MRowSheet.Select()
                     MRowSheet.ActivePosition = New GrapeCity.Win.ElTabelle.MPosition(0, enSheetCol1.商品名称カナ, enSheetRow.Row1)
@@ -1770,6 +1538,12 @@ Public Class frmNouhin
     Private Sub cmbKeishou_TextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles cmbNounyuuKeisho.TextChanged
         Denpyou.NounyuuSaki.Keishou = cmbNounyuuKeisho.Text
         UpdateFlagOn()
+    End Sub
+    '敬称のフォーカス喪失時、文字数制限を行う（指定の文字数で制限）
+    Private Sub cmbKeishou_Leave(ByVal sender As Object, ByVal e As EventArgs) Handles cmbNounyuuKeisho.Leave
+        '入力文字が指定の文字数を超えている時、指定の文字数分の文字列を取り出しセットする
+        cmbNounyuuKeisho.Text = StringsLeftB(cmbNounyuuKeisho.Text, FormKeishouLength)
+        ControlFocusCode(cmbNounyuuKeisho)
     End Sub
 
     '倉庫の値を変更した時
@@ -1995,8 +1769,8 @@ Public Class frmNouhin
 
         Finally
             isChangedUriageKubun = False
-            If isLeaveErrorNoCheck = False AndAlso (Control.ModifierKeys And Keys.Shift) <> Keys.Shift AndAlso (Control.ModifierKeys And Keys.Alt) <> Keys.Alt AndAlso Control.MouseButtons = MouseButtons.None Then
-                'メニュー押下時でなくシフトもALTもマウスも押されていなければ、アクティブセルを先頭にセット
+            If (Control.ModifierKeys And Keys.Shift) <> Keys.Shift AndAlso (Control.ModifierKeys And Keys.Alt) <> Keys.Alt AndAlso Control.MouseButtons = MouseButtons.None Then
+                'シフトもALTもマウスも押されていなければ、アクティブセルを先頭にセット
                 If MRowSheet.MaxMRows > 0 Then
                     If My.Settings.HanbaiKanriType = "C" Then
                         If My.Settings.EndUserName = "信和通信工業株式会社" Then
@@ -2031,7 +1805,7 @@ Public Class frmNouhin
         UpdateFlagOn()
     End Sub
 
-    '*信和*　仮伝票のチェックを変更した時
+    '*信和*　注文書送付のチェックを変更した時
     Private Sub chkKariDen_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles chkKariDen.CheckedChanged
         Denpyou.KariDen = chkKariDen.Checked
         UpdateFlagOn()
@@ -2046,8 +1820,8 @@ Public Class frmNouhin
 
         If sender Is mnuCmbForm Then
             If My.Settings.EndUserName = "信和通信工業株式会社" Then
-                '*信和*　納品伝票フォームに[A4]を含む時、管理資料プリンターを使用
-                If formNameOnly.IndexOf("A4") >= 0 Then
+                '*信和*　納品伝票フォームに"医師会"が含まれれば、管理資料プリンターを使用
+                If formNameOnly.IndexOf("医師会") >= 0 Then
                     mnuCmbPrinter.ComboBox.SelectedIndex = mnuCmbPrinter.FindStringExact(My.Settings.KanriSiryouPrinterName)
                 End If
             End If
@@ -2090,32 +1864,67 @@ Public Class frmNouhin
 
     'MultiRowSheetのセルが編集モードに入る時
     Private Sub MRowSheet_EnterEdit(ByVal sender As Object, ByVal e As GrapeCity.Win.ElTabelle.MEnterEditEventArgs) Handles MRowSheet.EnterEdit
-        ''日の出は、商品名にカーソル移動時、商品名の最後にカーソルをセットする
-        ''  （「MRowSheet.HighlightEditText=True」にしているとこの処理が効かないため、日の出はFalseとした）
-        'If My.Settings.EndUserName = "株式会社　日の出" Then
-        '    If MRowSheet.ActiveCellKey = "商品名称" Then
-        '        '商品名称の時、商品名の最後にカーソルを移動
-        '        Dim objTextEditor As GrapeCity.Win.ElTabelle.Editors.TextEditor = MRowSheet.ActiveCell.Editor
-        '        objTextEditor.SelectionStart = MRowSheet.ActiveCell.Text.Length  '選択テキストの開始位置を設定
-        '        objTextEditor.SelectionLength = 0  '選択テキストの長さを設定
-        '        MRowSheet.ActiveCell.Editor = objTextEditor
-        '    Else
-        '        '商品名称以外の項目は、テキストを選択状態にする（コンボ型はデフォルトで選択状態となる）
-        '        If TypeOf MRowSheet.ActiveCell.Editor Is GrapeCity.Win.ElTabelle.Editors.TextEditor Then
-        '            '文字型セルの時
-        '            Dim objTextEditor As GrapeCity.Win.ElTabelle.Editors.TextEditor = MRowSheet.ActiveCell.Editor
-        '            objTextEditor.HighlightText = True
-        '            MRowSheet.ActiveCell.Editor = objTextEditor
+        'カーソル移動不可を可能に戻す
+        If My.Settings.HanbaiKanriType = "C" Then
+            If My.Settings.EndUserName = "信和通信工業株式会社" Then
+                '*信和*　Cタイプでも受注は使用しない
+            Else
+                If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("受注明細検索ボタン").CanActivate = False Then
+                    MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("受注明細検索ボタン").CanActivate = True
+                End If
+            End If
+        End If
+        If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品コード").CanActivate = False Then
+            MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品コード").CanActivate = True
+        End If
+        If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品名称カナ").CanActivate = False Then
+            MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品名称カナ").CanActivate = True
+        End If
+        If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品検索ボタン").CanActivate = False Then
+            MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品検索ボタン").CanActivate = True
+        End If
+        If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品名称").CanActivate = False Then
+            MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品名称").CanActivate = True
+        End If
+        If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("入数").CanActivate = False Then
+            MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("入数").CanActivate = True
+        End If
+        If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("セット数").CanActivate = False Then
+            MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("セット数").CanActivate = True
+        End If
+        If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("数量").CanActivate = False Then
+            MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("数量").CanActivate = True
+        End If
+        If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("単位IN").CanActivate = False Then  '*江東高周波*
+            MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("単位IN").CanActivate = True
+        End If
 
-        '        ElseIf TypeOf MRowSheet.ActiveCell.Editor Is GrapeCity.Win.ElTabelle.Editors.NumberEditor Then
-        '            '数値型セルの時
-        '            Dim objNumberEditor As GrapeCity.Win.ElTabelle.Editors.NumberEditor = MRowSheet.ActiveCell.Editor
-        '            objNumberEditor.SelectionStart = 0  '選択テキストの開始位置を設定
-        '            objNumberEditor.SelectionLength = MRowSheet.ActiveCell.Text.Length  '選択テキストの長さを設定
-        '            MRowSheet.ActiveCell.Editor = objNumberEditor
-        '        End If
-        '    End If
-        'End If
+        '日の出は、商品名にカーソル移動時、商品名の最後にカーソルをセットする
+        '  （「MRowSheet.HighlightEditText=True」にしているとこの処理が効かないため、日の出はFalseとした）
+        If My.Settings.EndUserName = "株式会社　日の出" Then
+            If MRowSheet.ActiveCellKey = "商品名称" Then
+                '商品名称の時、商品名の最後にカーソルを移動
+                Dim objTextEditor As GrapeCity.Win.ElTabelle.Editors.TextEditor = MRowSheet.ActiveCell.Editor
+                objTextEditor.SelectionStart = MRowSheet.ActiveCell.Text.Length  '選択テキストの開始位置を設定
+                objTextEditor.SelectionLength = 0  '選択テキストの長さを設定
+                MRowSheet.ActiveCell.Editor = objTextEditor
+            Else
+                '商品名称以外の項目は、テキストを選択状態にする（コンボ型はデフォルトで選択状態となる）
+                If TypeOf MRowSheet.ActiveCell.Editor Is GrapeCity.Win.ElTabelle.Editors.TextEditor Then
+                    '文字型セルの時
+                    Dim objTextEditor As GrapeCity.Win.ElTabelle.Editors.TextEditor = MRowSheet.ActiveCell.Editor
+                    objTextEditor.HighlightText = True
+                    MRowSheet.ActiveCell.Editor = objTextEditor
+
+                ElseIf TypeOf MRowSheet.ActiveCell.Editor Is GrapeCity.Win.ElTabelle.Editors.NumberEditor Then
+                    '数値型セルの時
+                    Dim objNumberEditor As GrapeCity.Win.ElTabelle.Editors.NumberEditor = MRowSheet.ActiveCell.Editor
+                    objNumberEditor.SelectionStart = 0  '選択テキストの開始位置を設定
+                    objNumberEditor.SelectionLength = MRowSheet.ActiveCell.Text.Length  '選択テキストの長さを設定
+                    MRowSheet.ActiveCell.Editor = objNumberEditor
+                End If
+            End If
+        End If
     End Sub
 
     'MultiRowSheetのセルが編集モードを抜ける時
@@ -2298,8 +2107,8 @@ Public Class frmNouhin
                         '入力された受注コードに合致する受注一覧を表示
                         If FindJutyuMeisai(MRowSheet.ActiveCell.Text, mRow) = False Then
                             MRowSheet.MRows(mRow)("受注明細No").Value = 0
+                            e.Cancel = True  'セルの移動をキャンセル
                         End If
-                        e.Cancel = True  '通常の移動をキャンセル
                     End If
                     isChangedJutyuCode = False
                 End If
@@ -2307,18 +2116,18 @@ Public Class frmNouhin
                 '  受注コードが入力済の時、受注明細検索ボタンにカーソルを移動しない
                 If e.Cancel = False AndAlso MRowSheet.ActiveCell.Text <> "" AndAlso e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap Then
                     MRowSheet.ActiveCellKey = "商品コード"  'セルの移動
-                    e.Cancel = True  '通常の移動をキャンセル
+                    MRowSheet.MRows(mRow)("受注明細検索ボタン").CanActivate = False
                 End If
 
-                'ElseIf MRowSheet.ActivePosition.Column = enSheetCol2.受注明細検索ボタン AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row2 Then
-                '    '<受注明細検索ボタン>列の時
-                '    '  受注明細検索ボタンでEnterキーが押された時、受注明細検索画面を表示する
-                '    '  （Enterキーがひろえないので、Tabキーが押されていないか、次の項目に移動しているかで判断）
-                '    If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap AndAlso sheetKeyDownCode <> Keys.Tab Then
-                '        If FindJutyuMeisai("", mRow) = False Then
-                '            e.Cancel = True  'セルの移動をキャンセル（モードレス表示なので実際はキャンセルできない）
-                '        End If
-                '    End If
+            ElseIf MRowSheet.ActivePosition.Column = enSheetCol2.受注明細検索ボタン AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row2 Then
+                '<受注明細検索ボタン>列の時
+                '  受注明細検索ボタンでEnterキーが押された時、受注明細検索画面を表示する
+                '  （Enterキーがひろえないので、Tabキーが押されていないか、次の項目に移動しているかで判断）
+                If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap AndAlso sheetKeyDownCode <> Keys.Tab Then
+                    If FindJutyuMeisai("", mRow) = False Then
+                        e.Cancel = True  'セルの移動をキャンセル（モードレス表示なので実際はキャンセルできない）
+                    End If
+                End If
 
             ElseIf MRowSheet.ActivePosition.Column = enSheetCol1.商品コード AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row1 Then
                 '<商品コード>列の時
@@ -2334,9 +2143,27 @@ Public Class frmNouhin
                             ChangeShouhin(False, mRow, Nothing) '商品クリア
                             e.Cancel = True  'セルの移動をキャンセル
                         Else
-                            'カーソル移動（セルの移動はFindShouhinで）
-                            If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap Then
-                                e.Cancel = True  '通常の移動をキャンセル
+                            'カーソル移動（セルの移動はFindShouhinで。CanActivateの設定はLeaveCellで）
+                            If My.Settings.EndUserName = "株式会社　日の出" Then
+                                '*日の出*  商品後、商品名称にカーソル移動させる
+                                MRowSheet.MRows(mRow)("商品名称カナ").CanActivate = False
+                            ElseIf My.Settings.EndUserName = "信和通信工業株式会社" AndAlso MRowSheet.MRows(mRow)("商品名称").Text.Trim = "" Then
+                                '*信和*  商品名称未設定の商品時、商品名称にカーソル移動
+                                MRowSheet.MRows(mRow)("商品名称カナ").CanActivate = False
+                                'ElseIf My.Settings.EndUserName = "有限会社山田商店" Then
+                                '    '*山田商店*　商品後、入数にカーソル移動
+                                '    MRowSheet.MRows(mRow)("商品名称カナ").CanActivate = False
+                                '    MRowSheet.MRows(mRow)("商品名称").CanActivate = False
+                            Else
+                                '商品後、入数＝ゼロなら数量に移動、入数≠ゼロならセット数に移動
+                                If MRowSheet.MRows(mRow)("入数").Value = 0 Then
+                                    MRowSheet.MRows(mRow)("入数").CanActivate = False
+                                    MRowSheet.MRows(mRow)("セット数").CanActivate = False
+                                Else
+                                    MRowSheet.MRows(mRow)("入数").CanActivate = False
+                                End If
+                                MRowSheet.MRows(mRow)("商品名称カナ").CanActivate = False
+                                MRowSheet.MRows(mRow)("商品名称").CanActivate = False
                             End If
                         End If
                     End If
@@ -2355,42 +2182,61 @@ Public Class frmNouhin
                         If FindShouhin("", MRowSheet.ActiveCell.Text, mRow) = False Then
                             e.Cancel = True  'セルの移動をキャンセル
                         Else
-                            'カーソル移動（セルの移動はFindShouhinで）
-                            If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap Then
-                                e.Cancel = True  '通常の移動をキャンセル
+                            'カーソル移動（セルの移動はFindShouhinで。CanActivateの設定はLeaveCellで）
+                            If My.Settings.EndUserName = "株式会社　日の出" Then
+                                '*日の出*  商品後、商品名称にカーソル移動させる
+                                MRowSheet.MRows(mRow)("商品名称カナ").CanActivate = False
+                            ElseIf My.Settings.EndUserName = "信和通信工業株式会社" AndAlso MRowSheet.MRows(mRow)("商品名称").Text.Trim = "" Then
+                                '*信和*  商品名称未設定の商品時、商品名称にカーソル移動
+                                MRowSheet.MRows(mRow)("商品名称カナ").CanActivate = False
+                                'ElseIf My.Settings.EndUserName = "有限会社山田商店" Then
+                                '    '*山田商店*　商品後、入数にカーソル移動
+                                '    MRowSheet.MRows(mRow)("商品名称カナ").CanActivate = False
+                                '    MRowSheet.MRows(mRow)("商品名称").CanActivate = False
+                            Else
+                                '商品後、入数＝ゼロなら数量に移動、入数≠ゼロならセット数に移動
+                                If MRowSheet.MRows(mRow)("入数").Value = 0 Then
+                                    MRowSheet.MRows(mRow)("入数").CanActivate = False
+                                    MRowSheet.MRows(mRow)("セット数").CanActivate = False
+                                Else
+                                    MRowSheet.MRows(mRow)("入数").CanActivate = False
+                                End If
+                                MRowSheet.MRows(mRow)("商品名称カナ").CanActivate = False
+                                MRowSheet.MRows(mRow)("商品名称").CanActivate = False
                             End If
                         End If
                     End If
                     isChangedShouhinKana = False
                 End If
 
-                If e.Cancel = False AndAlso e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap Then
-                    '商品が入力済の時、商品検索ボタンにカーソルを移動しない
-                    If MRowSheet.MRows(mRow)("商品マスタNo").Value > 0 Then
-                        MRowSheet.ActiveCellKey = "商品名称"  'セルの移動
-                        e.Cancel = True  '通常の移動をキャンセル
-                    End If
+                '  商品コード、商品名称カナのどちらかが入力済の時、商品検索ボタンにカーソルを移動しない
+                If MRowSheet.MRows(mRow)("商品コード").Value <> "" OrElse MRowSheet.MRows(mRow)("商品名称カナ").Value <> "" Then
+                    MRowSheet.ActiveCellKey = "商品名称"  'セルの移動
+                    MRowSheet.MRows(mRow)("商品検索ボタン").CanActivate = False
                 End If
 
-                'ElseIf MRowSheet.ActivePosition.Column = enSheetCol1.商品検索ボタン AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row1 Then
-                '    '<商品検索ボタン>列の時
-                '    '  商品検索ボタンでEnterキーが押された時、商品検索画面を表示する
-                '    '  （Enterキーがひろえないので、Tabキーが押されていないか、次の項目に移動しているかで判断）
-                '    If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap AndAlso sheetKeyDownCode <> Keys.Tab Then
-                '        If FindShouhin("", "", mRow) = False Then
-                '            e.Cancel = True  'セルの移動をキャンセル
-                '        End If
-                '    End If
+            ElseIf MRowSheet.ActivePosition.Column = enSheetCol1.商品検索ボタン AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row1 Then
+                '<商品検索ボタン>列の時
+                '  商品検索ボタンでEnterキーが押された時、商品検索画面を表示する
+                '  （Enterキーがひろえないので、Tabキーが押されていないか、次の項目に移動しているかで判断）
+                If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap AndAlso sheetKeyDownCode <> Keys.Tab Then
+                    If FindShouhin("", "", mRow) = False Then
+                        e.Cancel = True  'セルの移動をキャンセル
+                    End If
+                End If
 
             ElseIf MRowSheet.ActivePosition.Column = enSheetCol2.商品名称 AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row2 Then
                 '<商品名>列の時
                 '  入数がゼロの時は数量にカーソル移動させる
-                If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap Then
-                    If MRowSheet.MRows(mRow)("商品マスタNo").Value > 0 AndAlso MRowSheet.MRows(mRow)("入数").Value = 0 Then
-                        MRowSheet.ActiveCellKey = "数量"  'セルの移動
-                        e.Cancel = True  '通常の移動をキャンセル
-                    End If
+                'If My.Settings.EndUserName = "有限会社山田商店" Then
+                '    '*山田商店*　商品後のカーソル移動は入数のまま
+                'Else
+                If MRowSheet.MRows(mRow)("入数").Value = 0 Then
+                    MRowSheet.ActiveCellKey = "数量"    'セルの移動
+                    MRowSheet.MRows(mRow)("入数").CanActivate = False
+                    MRowSheet.MRows(mRow)("セット数").CanActivate = False
                 End If
+                'End If
 
             ElseIf MRowSheet.ActivePosition.Column = enSheetCol2.消費税率 AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row2 Then
                 '<消費税率>列の時
@@ -2407,36 +2253,38 @@ Public Class frmNouhin
 
             ElseIf MRowSheet.ActivePosition.Column = enSheetCol1.セット数 AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row1 Then
                 '<セット数>列の時
-                If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap Then
-                    If MRowSheet.ActiveCell.Value <> 0 Then
-                        If My.Settings.EndUserName = "信和通信工業株式会社" Then
-                            MRowSheet.ActiveCellKey = "商品単価"  'セルの移動
-                        Else
-                            MRowSheet.ActiveCellKey = "単位IN"  'セルの移動
-                        End If
-                        e.Cancel = True  '通常の移動をキャンセル
+                If MRowSheet.ActiveCell.Value = 0 Then
+                    'MRowSheet.ActiveCellKey = "数量"  'セルの移動
+                Else
+                    If My.Settings.EndUserName = "信和通信工業株式会社" Then
+                        MRowSheet.ActiveCellKey = "商品単価"  'セルの移動
+                    Else
+                        MRowSheet.ActiveCellKey = "単位IN"  'セルの移動
                     End If
+                    MRowSheet.MRows(mRow)("数量").CanActivate = False
                 End If
 
             ElseIf MRowSheet.ActivePosition.Column = enSheetCol2.数量 AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row2 Then
                 '<数量>列の時
-                If My.Settings.EndUserName = "有限会社江東高周波工業" Then
+                If My.Settings.EndUserName = "江東高周波工業" Then
                     If e.MoveStatus = GrapeCity.Win.ElTabelle.MoveStatus.NextCellWithWrap AndAlso sheetKeyDownCode <> Keys.Tab Then
                         '*江東高周波*  数量入力後Enereキーなら、単価にカーソル移動させる
                         MRowSheet.ActiveCellKey = "商品単価"  'セルの移動
-                        e.Cancel = True  '通常の移動をキャンセル
+                        MRowSheet.MRows(mRow)("単位IN").CanActivate = False
                     End If
                 End If
 
             ElseIf MRowSheet.ActivePosition.Column = enSheetCol2.単位IN AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row2 Then
                 '<単位>列の時
+                '  入力文字が指定の文字数を超えている時、指定の文字数分の文字列を取り出しセットする
+                MRowSheet.ActiveCell.Text = StringsLeftB(MRowSheet.ActiveCell.Text, FormTanniLength)
                 MRowSheet.MRows(mRow)("単位").Value = MRowSheet.ActiveCell.Text  '入力用列から、データバウンド用列にセット
 
             ElseIf MRowSheet.ActivePosition.Column = enSheetCol2.商品単価 AndAlso MRowSheet.ActivePosition.Row = enSheetRow.Row2 Then
                 '<単価>列の時
                 '  単価が得意先別単価と違う場合、得意先別単価を登録させる
                 If MRowSheet.MRows(mRow)("商品単価").Value <> MRowSheet.MRows(mRow)("得意先別単価").Value Then
-                    If isShowTankaMSG AndAlso MRowSheet.MRows(mRow)("商品マスタNo").Value <> 0 AndAlso MRowSheet.MRows(mRow)("商品マスタNo").Value <> defaultShouhinNo Then
+                    If isShowTankaMSG AndAlso MRowSheet.MRows(mRow)("商品マスタNo").Value <> 0 AndAlso MRowSheet.MRows(mRow)("商品マスタNo").Value <> defaultShouhin.MasterNo Then
                         Dim DefButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button2  '単価登録確認のデフォルトボタン「いいえ」
                         If My.Settings.EndUserName = "海政インキ株式会社" Then
                             '*海政*　単価登録確認のデフォルトボタンを「はい」とする
@@ -2477,7 +2325,6 @@ Public Class frmNouhin
                         Else
                             MRowSheet.ActiveCellKey = "備考"  'セルの移動
                         End If
-                        e.Cancel = True  '通常の移動をキャンセル
                     End If
                 End If
 
@@ -2568,14 +2415,20 @@ Public Class frmNouhin
         Me.Text = TITLE & "（新規）"
         lblShusei.Visible = False
 
-        If My.Settings.EndUserName = "山田商店" Then
-            '*山田商店*　納入先がある時は納入先にカーソル移動し、ない時は日付にカーソル移動
-            ControlFocusCode(edtTokuiCode)
+        If My.Settings.EndUserName = "株式会社　日の出" Then
+            '日の出は、明細の商品コードにカーソル移動させる
+            MRowSheet.Select()
+            MRowSheet.ActivePosition = New GrapeCity.Win.ElTabelle.MPosition(0, enSheetCol1.商品コード, enSheetRow.Row1)
         Else
-            If drJisha("日付選択") = False Then
-                datSeikyuDate.Select()
+            If My.Settings.EndUserName = "山田商店" Then
+                '*山田商店*　納入先がある時は納入先にカーソル移動し、ない時は日付にカーソル移動
+                ControlFocusCode(edtTokuiCode)
             Else
-                datNouhinDate.Select()
+                If drJisha("日付選択") = False Then
+                    datSeikyuDate.Select()
+                Else
+                    datNouhinDate.Select()
+                End If
             End If
         End If
     End Sub
@@ -2627,7 +2480,8 @@ Public Class frmNouhin
         CFormCommon.SetAlternateColor(MRowSheet, 0, LastColumn)
 
         InsertMrowNullMeisai(targetMRow - 1)  '１行上に行を挿入
-        SettingMrow(targetMRow + 1, targetMRow - 1)  '明細行の個別設定
+        Dim orgCmbEditor As GrapeCity.Win.ElTabelle.Editors.SuperiorComboEditor = MRowSheet.MRows(targetMRow + 1)("消費税率").Editor
+        MRowSheet.MRows(targetMRow - 1)("消費税率").Editor = orgCmbEditor  'デフォルトの消費税率以外の税率がある時、データのセット(Move)より先にコンボボックスを設定しておかないと、後ろの値が全てセットされなくなってしまう（画面上は表示されていても登録すると値がセットされていない）
         MRowSheet.MRows(targetMRow + 1).Move(targetMRow - 1, GrapeCity.Win.ElTabelle.DataTransferMode.All)  '選択行を挿入した行に移動
         MRowSheet.RemoveMRow(targetMRow + 1, False)  '移動した行を削除
         UpdateFlagOn()
@@ -2642,42 +2496,12 @@ Public Class frmNouhin
         CFormCommon.SetAlternateColor(MRowSheet, 0, LastColumn)
 
         InsertMrowNullMeisai(targetMRow + 2)  '１行下に行を挿入
-        SettingMrow(targetMRow, targetMRow + 2)  '明細行の個別設定
+        Dim orgCmbEditor As GrapeCity.Win.ElTabelle.Editors.SuperiorComboEditor = MRowSheet.MRows(targetMRow)("消費税率").Editor
+        MRowSheet.MRows(targetMRow + 2)("消費税率").Editor = orgCmbEditor
         MRowSheet.MRows(targetMRow).Move(targetMRow + 2, GrapeCity.Win.ElTabelle.DataTransferMode.All)  '選択行を挿入した行に移動
         MRowSheet.RemoveMRow(targetMRow, False)  '移動した行を削除
         UpdateFlagOn()
     End Sub
-
-    '明細行のコピー（選択行を選択行の下にコピー）
-    Private Function CopyRow(ByVal originalPosition As GrapeCity.Win.ElTabelle.MPosition) As Boolean
-        Dim targetMRow As Integer = originalPosition.MRow
-
-        If MRowSheet.Enabled = False Then Return False
-        If targetMRow < 0 Then Return False
-        If targetMRow >= (MRowSheet.MaxMRows - 1) Then Return False
-
-        'すでにMax行ならコピーしない
-        Dim meisaiMaxRow As Integer = DataInSheet(MRowSheet)
-        If meisaiMaxRow >= Denpyou.KoumokuSu Then
-            Return False
-        End If
-
-        '交互色を設定し直す（背景色を変更したセルは交互色より背景色が優先されるため、一度背景色をクリアしてから交互色を再設定）
-        CFormCommon.SetAlternateColor(MRowSheet, 0, LastColumn)
-
-        '１行追加
-        InsertMrowNullMeisai(targetMRow + 1)  'カーソル位置の下に１行挿入
-        MRowSheet.RemoveMRow(MRowSheet.MaxMRows - 1, False)  '挿入した分、最終行を削除
-
-        'コピー
-        SettingMrow(targetMRow, targetMRow + 1)  '明細行の個別設定
-        MRowSheet.MRows(targetMRow).Copy(targetMRow + 1, GrapeCity.Win.ElTabelle.DataTransferMode.All)  '選択行を挿入した行にコピー
-        UpdateFlagOn()
-
-        SetGoukei()  '合計金額をセット
-
-        Return True
-    End Function
 
     '納品伝票、納品明細の削除処理
     Private Function DeleteRecord() As Boolean
@@ -2986,10 +2810,10 @@ Public Class frmNouhin
         End Try
     End Sub
 
-    '*信和*　領収書の印刷
+    '領収書の印刷（信和のみ）
     Private Sub PrintRyoushuSho(ByVal Preview As Boolean)
         '新規登録で伝票コードが自動採番の時は、伝票コードが確定しないと印刷できない
-        If Denpyou.Tokuisaki.DenpyouCodeUpdate AndAlso Denpyou.TableNo <= 0 Then
+        If Denpyou.Tokuisaki.DenpyouCodeUpdate AndAlso Denpyou.TableNo = 0 Then
             If isChanged Then
                 If MessageBox.Show("印刷するためには伝票を登録する必要が有ります。" & vbCrLf & "この納品伝票を登録しますか？", Me.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) _
                   = DialogResult.Yes Then
@@ -3007,7 +2831,6 @@ Public Class frmNouhin
             Exit Sub
         End If
 
-        Dim frmPrintForm As frmPrintForm = Nothing
         Try
             'OPEN
             '　ツールメニューで選択した領収書フォーム/プリンタを使用する
@@ -3025,7 +2848,7 @@ Public Class frmNouhin
                 Exit Sub
             End If
             Dim selectedPrinter As String = mnuCmbPrinterRyoushuSho.SelectedItem
-            frmPrintForm = New frmPrintForm
+            Dim frmPrintForm As New frmPrintForm
             If frmPrintForm.PrintOpen(selectedForm, selectedPrinter, , Me.Text, CSingleton.CSetting.Connect) = False Then
                 frmPrintForm.Dispose()
                 Exit Sub
@@ -3033,8 +2856,8 @@ Public Class frmNouhin
 
             'プリントデータのセット
             With frmPrintForm
+
                 .set_TagData("ナンバー", Denpyou.Code)
-                .set_TagData("金額", sheetGoukei(enSheetGoukeiCol.合計, enSheetGoukeiRow.合計行).Value * Denpyou.UriageKubun.Zougen)
                 .set_TagData("但", Denpyou.TadasiGaki)
 
                 .set_TagData("年", DateFormat(Denpyou.NouhinDate, drJisha("和暦"), "yyyy", "ggyy"))
@@ -3052,53 +2875,53 @@ Public Class frmNouhin
                 .set_TagData("名称2", Denpyou.Tokuisaki.Name2)
                 .set_TagData("敬称", Denpyou.Tokuisaki.Keishou)
 
+                If Denpyou.Tokuisaki.ZeiKubun <> enZeikubun.非課税 AndAlso Denpyou.Tokuisaki.ShouhizeiKeisan = enZeiKeisan.請求時 Then
+                End If
                 If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.外税 Then
-                    .set_TagData("税抜税込", "税抜")
-                ElseIf Denpyou.Tokuisaki.ZeiKubun = enZeikubun.内税 Then
-                    .set_TagData("税抜税込", "税込")
+                    .set_TagData("税抜", "○")
                 Else
-                    .set_TagData("税抜税込", "")
+                    .set_TagData("税込", "○")
                 End If
 
-                If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.非課税 OrElse Denpyou.Tokuisaki.ShouhizeiKeisan = enZeiKeisan.請求時 Then
-                    '非課税 または 請求時（内税、外税）の時、消費税率は表示しない
-                Else
-                    If sheetGoukei.MaxRows > 1 Then
-                        .set_TagData("消費税率", sheetGoukei(enSheetGoukeiCol.消費税率, enSheetGoukeiRow.税率開始行).Value * 100)  '最大の消費税率
+                For idx As Integer = 0 To sheetGoukei.MaxRows - 1
+                    Dim idxText As String
+                    If idx = 0 Then
+                        idxText = ""
                     Else
-                        .set_TagData("消費税率", Denpyou.aryRate(0) * 100)
+                        If sheetGoukei(enSheetGoukeiCol.消費税率, idx).Value = 0 Then Continue For  '非課税は表示しない（非課税はsheetGoukeiの最下行）
+                        idxText = idx.ToString("#0")
                     End If
-                    .set_TagData("税抜額", sheetGoukei(enSheetGoukeiCol.税抜額, enSheetGoukeiRow.合計行).Value * Denpyou.UriageKubun.Zougen)
-                    .set_TagData("消費税額", sheetGoukei(enSheetGoukeiCol.消費税額, enSheetGoukeiRow.合計行).Value * Denpyou.UriageKubun.Zougen)
-                End If
 
-                For idx As Integer = enSheetGoukeiRow.税率開始行 To sheetGoukei.MaxRows - 1
-                    If sheetGoukei(enSheetGoukeiCol.消費税率, idx).Value = 0 Then Continue For  '非課税は表示しない（非課税はsheetGoukeiの最下行）
-
-                    Dim idxText As String = idx.ToString("#0")
-                    .set_TagData("消費税率" & idxText, sheetGoukei(enSheetGoukeiCol.消費税率, idx).Value * 100)
-                    .set_TagData("軽減税率" & idxText, If(sheetGoukei(enSheetGoukeiCol.消費税率テキスト, idx).Text.IndexOf("軽") >= 0, "軽", ""))
-                    If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.外税 Then
-                        .set_TagData("金額" & idxText, sheetGoukei(enSheetGoukeiCol.税抜額, idx).Value * Denpyou.UriageKubun.Zougen)
+                    If idx <> 0 Then
+                        .set_TagData("消費税率" & idxText, sheetGoukei(enSheetGoukeiCol.消費税率, idx).Value * 100)
+                        .set_TagData("軽減税率" & idxText, If(sheetGoukei(enSheetGoukeiCol.消費税率テキスト, idx).Text.IndexOf("軽") >= 0, "軽", ""))
                     Else
-                        .set_TagData("金額" & idxText, sheetGoukei(enSheetGoukeiCol.合計, idx).Value * Denpyou.UriageKubun.Zougen)
+                        If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.非課税 OrElse Denpyou.Tokuisaki.ShouhizeiKeisan = enZeiKeisan.請求時 Then
+                            '非課税 または 請求時（内税、外税）の時、消費税率は表示しない
+                        Else
+                            If sheetGoukei.MaxRows > 1 Then
+                                .set_TagData("消費税率", sheetGoukei(enSheetGoukeiCol.消費税率, 1).Value * 100)  '入力した最大の消費税率
+                            Else
+                                .set_TagData("消費税率", Denpyou.aryRate(0) * 100)
+                            End If
+                        End If
                     End If
-                    If Denpyou.Tokuisaki.ShouhizeiKeisan <> enZeiKeisan.請求時 Then
-                        .set_TagData("消費税額" & idxText, sheetGoukei(enSheetGoukeiCol.消費税額, idx).Value * Denpyou.UriageKubun.Zougen)
-                    End If
+                    .set_TagData("今回買上額" & idxText, sheetGoukei(enSheetGoukeiCol.税抜額, idx).Value * Denpyou.UriageKubun.Zougen)
+                    .set_TagData("消費税" & idxText, sheetGoukei(enSheetGoukeiCol.消費税額, idx).Value * Denpyou.UriageKubun.Zougen)
+                    .set_TagData("金額" & idxText, sheetGoukei(enSheetGoukeiCol.合計, idx).Value * Denpyou.UriageKubun.Zougen)
                 Next
+
             End With
 
             'プリント/プレビュー
             If Preview Then
-                frmPrintForm.Preview()  'プレビュー
+                frmPrintForm.Preview(FormWindowState.Maximized)  'プレビュー
             Else
                 frmPrintForm.Print(drJisha("印刷ダイアログ"))  '直接プリント
                 frmPrintForm.Dispose()
             End If
 
         Catch ex As Exception
-            If frmPrintForm IsNot Nothing Then frmPrintForm.Dispose()
             ErrProc(ex, Me.Text)
         End Try
     End Sub
@@ -3245,7 +3068,7 @@ Public Class frmNouhin
                 End If
 
                 '伝票コードの重複チェック
-                If Not CheckDenpyouCode(cnDenpyou, True) Then
+                If Not CheckDenpyouCode(True, cnDenpyou) Then
                     Return False
                 End If
 
@@ -3327,7 +3150,6 @@ Public Class frmNouhin
                             drDenpyou("受注伝票No") = Denpyou.JutyuDenpyouNo
                         End If
                         drDenpyou("仕入伝票No") = Denpyou.SiireDenpyouNo
-
                         If Denpyou.TableNo > 0 Then
                             '修正の時、元伝票のテーブルNoをセット
                             drDenpyou("修正元テーブルNo") = Denpyou.TableNo
@@ -3483,8 +3305,8 @@ Public Class frmNouhin
                 End Using
             End Using
 
-            If Denpyou.TableNo <= 0 Then  '追加の時
-                Denpyou.NewCode = GetCountUpNextCode(CDec(Denpyou.Code), drJisha("納品伝票コード桁数"), 1)  '次回の伝票コードを採番
+            If Denpyou.TableNo = 0 Then  '追加の時
+                Denpyou.NewCode = CDec(Denpyou.Code) + 1
             End If
 
             '登録/修正したデータを取得し直す
@@ -3760,9 +3582,6 @@ Public Class frmNouhin
                     'rowNewMeisai("受注明細No") = 0
                     rowNewMeisai("受注明細No") = MRowSheet.MRows(mRow)("受注明細No").Value
                 End If
-#If SanOka Then
-                rowNewMeisai("出荷予定No") = 0  '*サンオカ*　複写時は連動しない
-#End If
 
                 .dtMeisai.Rows.Add(rowNewMeisai)  '行をDataTableに追加
             Next
@@ -3977,9 +3796,12 @@ Public Class frmNouhin
                         'カーソル移動
                         MRowSheet.Select()
                         If MRowSheet.MRows(0)("入数").Value = 0 Then
-                            MRowSheet.ActiveCellKey = "数量"
+                            MRowSheet.ActiveCellKey = "数量"    'セルの移動
+                            MRowSheet.MRows(0)("入数").CanActivate = False
+                            MRowSheet.MRows(0)("セット数").CanActivate = False
                         Else
-                            MRowSheet.ActiveCellKey = "セット数"
+                            MRowSheet.ActiveCellKey = "セット数"    'セルの移動
+                            MRowSheet.MRows(0)("入数").CanActivate = False
                         End If
                     End If
                     Me.BringToFront()  '最前面に表示する
@@ -4550,7 +4372,7 @@ Public Class frmNouhin
                 SetUriageKubunInfo(cnTable, defaultUriageKubun)
 
                 .Tekiyou = ""
-                .TadasiGaki = ""  '*信和*　項目追加
+                .TadasiGaki = ""  '信和通信のみ使用
 
                 .NyukinNo = 0
                 .MitumoriNo = 0
@@ -4602,7 +4424,7 @@ Public Class frmNouhin
         Next
     End Sub
 
-    '納品伝票・納品明細からデータを取得（Denpyouに内容をセット）（検索時は修正、複写入力時は新規作成）
+    '納品伝票・納品明細からデータを得る（Denpyouに内容をセット）
     '  引数：  isCopy:複写入力時True
     '  戻値：  1=正常, 0=指定伝票 , -1=データなし
     Private Function GetRecord(ByVal tableNo As Integer, ByVal isCopy As Boolean) As Integer
@@ -4941,9 +4763,6 @@ Public Class frmNouhin
                     If My.Settings.HanbaiKanriType = "C" Then
                         rowNewMeisai("受注明細No") = GetInt(drMeisaiCopy("受注明細No"))
                     End If
-#If SanOka Then
-                    rowNewMeisai("出荷予定No") = 0  '*サンオカ*　複写時は連動しない
-#End If
 
                     dtMeisai.Rows.Add(rowNewMeisai)  '行をDataTableに追加
                 Next
@@ -4958,7 +4777,7 @@ Public Class frmNouhin
         Return 1  '正常
     End Function
 
-    '見積書・見積明細からデータを取得し、納品伝票DataSetを作成する（Denpyouに内容をセット）（新規作成）
+    '見積書・見積明細からデータを得、納品伝票DataSetを作成する（Denpyouに内容をセット）
     '  戻値：  True=正常, False=データなし
     Private Function GetRecordMitumori(ByVal tableNo As Integer) As Boolean
         Using cnTable As New SqlConnection(CSingleton.CSetting.Connect)
@@ -4972,24 +4791,16 @@ Public Class frmNouhin
                 tableNo = newDenpyouNo  '変更後のテーブルNo
             End If
 
-            'TableNoをキーに見積書/見積明細からデータを取得
-            '　見積内訳がなければ、見積内訳件数は0
-            sSQL = "SELECT 見積書.テーブルNo, 見積書.コード, 見積書.処理日, 見積書.得意先税区分 AS 見積書税区分, 見積書.消費税計算方法 AS 見積書消費税計算方法, 見積書.端数 AS 見積書端数, 見積書.掛率 AS 見積書掛率, " _
-                 & "見積明細.*, " _
-                 & "ISNULL(内訳.内訳件数,0) AS 見積内訳件数, " _
-                 & "ISNULL(得意先マスタ.マスタNo,0) AS 得意先マスタNo, 得意先マスタ.コード AS 得意先コード, 得意先マスタ.名称, 得意先マスタ.名称カナ, 得意先マスタ.名称2, 得意先マスタ.敬称, 得意先マスタ.備考, 得意先マスタ.諸口フラグ, 得意先マスタ.請求先フラグ, 得意先マスタ.請求先マスタNo, " _
+            'TableNoをキーに見積書からデータを得る
+            sSQL = "SELECT 見積書.テーブルNo, 見積書.コード, 見積書.処理日, 見積書.担当者マスタNo, 見積書.得意先税区分 AS 見積書税区分, 見積書.端数 AS 見積書端数, 見積書.掛率 AS 見積書掛率, 見積書.消費税率 AS 見積書消費税率, " _
+                 & "得意先マスタ.マスタNo AS 得意先マスタNo, 得意先マスタ.コード AS 得意先コード, 得意先マスタ.名称, 得意先マスタ.名称カナ, 得意先マスタ.名称2, 得意先マスタ.敬称, 得意先マスタ.備考, 得意先マスタ.諸口フラグ, 得意先マスタ.請求先フラグ, 得意先マスタ.請求先マスタNo, " _
                  & "得意先マスタ.標準ﾌｫｰﾑ, 得意先マスタ.納品伝票フォーム, 得意先マスタ.納品伝票コード自動更新, 得意先マスタ.掛率, 得意先マスタ.端数, 得意先マスタ.伝票コードフラグ, 得意先マスタ.納品伝票項目数, 得意先マスタ.締日, 得意先マスタ.与信限度額, 得意先マスタ.税区分, 得意先マスタ.消費税計算方法, " _
                  & "請求先.標準ﾌｫｰﾑ AS 請求先標準ﾌｫｰﾑ, 請求先.納品伝票フォーム AS 請求先納品伝票フォーム, 請求先.納品伝票コード自動更新 AS 請求先納品伝票コード自動更新, 請求先.掛率 AS 請求先掛率, 請求先.端数 AS 請求先端数, 請求先.伝票コードフラグ AS 請求先伝票コードフラグ, 請求先.納品伝票項目数 AS 請求先納品伝票項目数, 請求先.締日 AS 請求先締日, 請求先.与信限度額 AS 請求先与信限度額, 請求先.税区分 AS 請求先税区分, 請求先.消費税計算方法 AS 請求先消費税計算方法, " _
-                 & "CAST(ISNULL(納入先.得意先マスタNo,0) AS BIT) AS 納入先有無, " _
-                 & "ISNULL(担当者マスタ.マスタNo,0) AS 担当者マスタNo, 担当者マスタ.コード AS 担当者コード, 担当者マスタ.氏名 AS 担当者氏名, 担当者マスタ.氏名カナ AS 担当者氏名カナ " _
-                 & "FROM 見積書 INNER JOIN 見積明細 ON 見積書.テーブルNo = 見積明細.見積書No " _
-                 & "LEFT OUTER JOIN (SELECT 見積書No, COUNT(テーブルNo) AS 内訳件数 FROM 見積内訳 WHERE 削除 = 0 AND (数量 <> 0 OR 税抜金額 <> 0) GROUP BY 見積書No) AS 内訳 ON 見積書.テーブルNo = 内訳.見積書No " _
-                 & "LEFT OUTER JOIN 得意先マスタ ON 見積書.得意先マスタNo = 得意先マスタ.マスタNo " _
+                 & "CAST(ISNULL(納入先.得意先マスタNo,0) AS BIT) AS 納入先有無 " _
+                 & "FROM 見積書 LEFT OUTER JOIN 得意先マスタ ON 見積書.得意先マスタNo = 得意先マスタ.マスタNo " _
                  & "LEFT OUTER JOIN 得意先マスタ AS 請求先 ON 得意先マスタ.請求先マスタNo = 請求先.マスタNo " _
                  & "LEFT OUTER JOIN (SELECT 得意先マスタNo FROM 納入先マスタ GROUP BY 得意先マスタNo) AS 納入先 ON 得意先マスタ.マスタNo = 納入先.得意先マスタNo " _
-                 & "LEFT OUTER JOIN 担当者マスタ ON 見積書.担当者マスタNo = 担当者マスタ.マスタNo " _
-                 & "WHERE 見積書.テーブルNo = " & tableNo & " AND 見積書.削除 = 0 AND 見積明細.削除 = 0 " _
-                 & "ORDER BY 見積明細.行番号"
+                 & "WHERE 見積書.テーブルNo = " & tableNo & " AND 見積書.削除 = 0 "
             Dim dtMitumori As DataTable = CDBCommon.GetDataTable(cnTable, sSQL)
             If CDBCommon.DBError OrElse dtMitumori.Rows.Count <= 0 Then
                 MessageBox.Show("検索条件に該当する見積書は見つかりません。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -4997,35 +4808,27 @@ Public Class frmNouhin
             End If
             Dim drMitumori As DataRow = dtMitumori.Rows(0)
 
-            If drMitumori("得意先マスタNo") = 0 Then
+            If GetInt(drMitumori("得意先マスタNo")) = 0 Then
                 MessageBox.Show("得意先コードが入力されていない見積書は、参照できません。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Return False
             End If
 
-            '見積書入力時の税区分・消費税計算方法・端数とマスタの設定が同じかどうかのチェック
-            '（掛率が違う場合は、金額は見積書のまま。マスタの設定で再計算されない。）
-            '（消費税計算方法は、マスタが請求時の時は見積書では取引時に変換されるため、違うかどうかいちいち表示しない）
-            Dim masterZeikubun As Byte, masterShouhizeiKeisan As Short, masterHasuu As Short
+            '見積書入力時の税区分・端数・掛率とマスタの設定が同じかどうかのチェック
+            Dim masterZeikubun As Byte, masterHasuu As Short
             If drMitumori("請求先フラグ") Then
                 masterZeikubun = drMitumori("請求先税区分")
-                masterShouhizeiKeisan = drMitumori("請求先消費税計算方法")
                 masterHasuu = drMitumori("請求先端数")
             Else
                 masterZeikubun = drMitumori("税区分")
-                masterShouhizeiKeisan = drMitumori("消費税計算方法")
                 masterHasuu = drMitumori("端数")
             End If
             Dim message As String = ""
             If drMitumori("見積書税区分") <> masterZeikubun Then
                 message &= "税区分"
             End If
-            If (masterZeikubun <> enZeikubun.非課税 AndAlso drMitumori("見積書税区分") <> enZeikubun.非課税) _
-              AndAlso masterShouhizeiKeisan <> enZeiKeisan.請求時 _
-              AndAlso drMitumori("見積書消費税計算方法") <> masterShouhizeiKeisan Then
-                message &= If(message <> "", "・", "") & "消費税計算方法"
-            End If
             If drMitumori("見積書端数") <> masterHasuu Then
-                message &= If(message <> "", "・", "") & "端数"
+                If message <> "" Then message &= "・"
+                message &= "端数"
             End If
             If message <> "" Then
                 If MessageBox.Show("見積書入力時の" & message & "が、得意先マスタの設定と違います。" & vbCrLf & vbCrLf _
@@ -5135,10 +4938,14 @@ Public Class frmNouhin
                 End If
 
                 With .Tantousha
-                    .MasterNo = drMitumori("担当者マスタNo")
-                    .Code = drMitumori("担当者コード").ToString
-                    .Name = drMitumori("担当者氏名").ToString
-                    .NameKana = drMitumori("担当者氏名カナ").ToString
+                    .MasterNo = GetInt(drMitumori("担当者マスタNo"))
+                    Dim CTantousha As New HanbaikanriDialog.CTantousha()
+                    Dim drTantou As DataRow = CTantousha.GetMaster(.MasterNo, cnTable)
+                    If drTantou IsNot Nothing Then
+                        .Code = drTantou("コード").ToString
+                        .Name = drTantou("氏名").ToString
+                        .NameKana = drTantou("氏名カナ").ToString
+                    End If
                 End With
             End With
 
@@ -5148,25 +4955,7 @@ Public Class frmNouhin
             'If DirectCast(oldAryRate, IStructuralEquatable).Equals(Denpyou.aryRate, StructuralComparisons.StructuralEqualityComparer) = False Then
             '    MessageBox.Show("見積書の消費税率は[" & oldAryRate(0).ToString("#0%") & "]ですが、[" & Denpyou.aryRate(0).ToString("#0%") & "]に変更します。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Information)
             'End If
-
-            '内訳がある見積書の時、メッセージを表示
-            '（内訳内で複数消費税率が使われている場合、内訳内が別の消費税率の場合等、計算し直しで端数や消費税が変わる可能性あり）
-            message = ""
-            If drMitumori("見積内訳件数") > 0 Then
-                message &= "・見積内訳レベルでなく、見積明細レベルで参照します。" & vbCrLf &
-                           "（明細レベルで現在の設定で消費税を計算し直すため、金額を確認してください）" & vbCrLf
-            End If
-
-            '参照元見積書の消費税率/軽減税率と、現在のマスタの消費税率/軽減税率が違う場合、メッセージを表示
-            Dim ret As Boolean = CDenpyouCommon.CheckMitumoriSanshoZeiritsu(cnTable, tableNo, Denpyou.SeikyuDate, Denpyou.Tokuisaki.ZeiKubun)
-            If ret = False Then
-                message &= "・見積時の消費税率と、現在の消費税マスタ/商品マスタの設定が違う場合、現在の設定で計算し直します。" & vbCrLf &
-                           "（手入力で変更した消費税率は、現在の消費税率で計算し直します）" & vbCrLf &
-                           "（得意先税区分と商品税区分が違う場合、端数が変わる場合があります）"
-            End If
-            If message <> "" Then
-                MessageBox.Show(message, Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Information)
-            End If
+            MessageBox.Show("見積時の消費税率と、現在の消費税マスタ/商品マスタの設定が違う場合、現在の設定で計算し直します。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Information)
 
             '納品伝票、納品明細の新規DataSetを作成
             MakeEditCommandsDenpyou(cnTable, 0)  'テーブルNo=0でSelect
@@ -5176,24 +4965,32 @@ Public Class frmNouhin
             Dim rowNewDenpyou As DataRow = dtDenpyou.NewRow  '行を生成
             dtDenpyou.Rows.Add(rowNewDenpyou)  '行をDataTableに追加
 
+            '見積明細からデータを得る
+            sSQL = "SELECT * FROM 見積明細 " _
+                 & "WHERE 見積明細.見積書No = " & tableNo & " AND 見積明細.削除 = 0 " _
+                 & "ORDER BY 見積明細.行番号"
+            Dim dtMitumoriMeisai As DataTable = CDBCommon.GetDataTable(cnTable, sSQL)
+            If CDBCommon.DBError OrElse dtMitumoriMeisai.Rows.Count <= 0 Then
+                MessageBox.Show("検索条件に該当する見積明細は見つかりません。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Return False
+            End If
+
             '見積明細の内容をセット
-            If Denpyou.KoumokuSu < dtMitumori.Rows.Count Then
-                Denpyou.KoumokuSu = dtMitumori.Rows.Count
+            If Denpyou.KoumokuSu < dtMitumoriMeisai.Rows.Count Then
+                Denpyou.KoumokuSu = dtMitumoriMeisai.Rows.Count
             End If
 
             '  納品明細 追加
-            '　※内訳有見積明細の場合、見積明細の消費税率は0%で、内訳の消費税率が混在している場合は消費税/税込金額も混在した額だが、SetFormのRecalcでマスタの設定で再計算される
-            '　　手入力で消費税率を変更していた場合はマスタの設定に戻り、金額が変わるため注意（SetFormのRecalcで再設定と再計算）
             Dim isChangedDigit As Boolean = False  '見積書と納品伝票で、小数点以下の桁数設定が違う時True
             Dim rowNewMeisai As DataRow
-            For iRow As Integer = 0 To dtMitumori.Rows.Count - 1
-                Dim drMitumoriMeisai As DataRow = dtMitumori.Rows(iRow)
+            For iRow As Integer = 0 To dtMitumoriMeisai.Rows.Count - 1
+                Dim drMitumoriMeisai As DataRow = dtMitumoriMeisai.Rows(iRow)
 
                 rowNewMeisai = dtMeisai.NewRow  '行を生成
 
                 rowNewMeisai("商品コード") = drMitumoriMeisai("商品コード").ToString
                 rowNewMeisai("商品名称カナ") = drMitumoriMeisai("商品名称カナ").ToString
-                rowNewMeisai("商品名称") = drMitumoriMeisai("商品名称").ToString & If(drMitumoriMeisai("商品名称2").ToString <> "", " " & drMitumoriMeisai("商品名称2").ToString, "")
+                rowNewMeisai("商品名称") = drMitumoriMeisai("商品名称").ToString
                 rowNewMeisai("消費税率") = drMitumoriMeisai("消費税率")
                 rowNewMeisai("軽減税率") = drMitumoriMeisai("軽減税率")
                 rowNewMeisai("入数") = drMitumoriMeisai("入数")
@@ -5240,9 +5037,6 @@ Public Class frmNouhin
                 If My.Settings.HanbaiKanriType = "C" Then
                     rowNewMeisai("受注明細No") = 0
                 End If
-#If SanOka Then
-                rowNewMeisai("出荷予定No") = 0  '*サンオカ*
-#End If
 
                 dtMeisai.Rows.Add(rowNewMeisai)  '行をDataTableに追加
             Next
@@ -5259,7 +5053,7 @@ Public Class frmNouhin
         Return True
     End Function
 
-    '受注伝票・受注明細からデータを取得し、納品伝票DataSetを作成する（Denpyouに内容をセット）（新規作成）
+    '受注伝票・受注明細からデータを得、納品伝票DataSetを作成する（Denpyouに内容をセット）
     '  戻値：  True=正常, False=データなし
     Private Function GetRecordJutyu(ByVal tableNo As Integer) As Boolean
         Using cnTable As New SqlConnection(CSingleton.CSetting.Connect)
@@ -5487,9 +5281,6 @@ Public Class frmNouhin
                 If My.Settings.HanbaiKanriType = "C" Then
                     rowNewMeisai("受注明細No") = drJutyuMeisai("テーブルNo")
                 End If
-#If SanOka Then
-                rowNewMeisai("出荷予定No") = 0  '*サンオカ*
-#End If
 
                 dtMeisai.Rows.Add(rowNewMeisai)  '行をDataTableに追加
             Next
@@ -5500,7 +5291,7 @@ Public Class frmNouhin
         Return True
     End Function
 
-    '受注明細からデータを取得し、明細行にセット（シートの明細行に直接セット）
+    '受注明細からデータを得、明細行にセット
     '  戻値：  True=正常, False=データなし
     Private Function GetRecordJutyuMeisai(ByVal mRow As Integer, ByVal tableNo As Integer) As Boolean
         Using cnTable As New SqlConnection(CSingleton.CSetting.Connect)
@@ -5508,11 +5299,9 @@ Public Class frmNouhin
 
             '受注明細からデータを得る
             Dim sSQL As String
-            sSQL = "SELECT 受注伝票.コード, 受注伝票.納期日, 受注明細.*, " &
-                   "ISNULL(商品マスタ.マスタNo,0) AS 商品マスタマスタNo, 商品マスタ.コード AS 商品マスタコード, ISNULL(商品マスタ.標準単価,0) AS 商品標準単価, ISNULL(商品マスタ.在庫管理有効,0) AS 在庫管理有効, ISNULL(商品マスタ.消費税率区分," & enTaxRateKubun.税率1 & ") AS 消費税率区分 " &
-                   "FROM 受注明細 INNER JOIN 受注伝票 ON 受注明細.受注伝票No = 受注伝票.テーブルNo " &
-                   "LEFT OUTER JOIN 商品マスタ ON 受注明細.商品マスタNo = 商品マスタ.マスタNo " &
-                   "WHERE 受注明細.テーブルNo = " & tableNo & " AND 受注明細.削除 = 0 AND 受注伝票.削除 = 0"
+            sSQL = "SELECT 受注伝票.コード, 受注伝票.納期日, 受注明細.* " _
+                 & "FROM 受注明細 INNER JOIN 受注伝票 ON 受注明細.受注伝票No = 受注伝票.テーブルNo " _
+                 & "WHERE 受注明細.テーブルNo = " & tableNo & " And 受注明細.削除 = 0 And 受注伝票.削除 = 0"
             Dim dtJutyuMeisai As DataTable = CDBCommon.GetDataTable(cnTable, sSQL)
             If CDBCommon.DBError OrElse dtJutyuMeisai.Rows.Count <= 0 Then
                 MessageBox.Show("検索条件に該当する受注明細は見つかりません。", Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -5526,16 +5315,11 @@ Public Class frmNouhin
 
             '受注明細の内容をSheetにセット
             MRowSheet.MRows(mRow)("受注コード").Value = drJutyuMeisai("コード").ToString
-            MRowSheet.MRows(mRow)("商品コード").Value = drJutyuMeisai("商品マスタコード").ToString
+            MRowSheet.MRows(mRow)("商品コード").Value = drJutyuMeisai("商品コード").ToString
             MRowSheet.MRows(mRow)("商品名称カナ").Value = drJutyuMeisai("商品名称カナ").ToString
             MRowSheet.MRows(mRow)("商品名称").Value = drJutyuMeisai("商品名称").ToString
-            If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.非課税 Then
-                MRowSheet.MRows(mRow)("消費税率").Value = 0
-                MRowSheet.MRows(mRow)("軽減税率").Value = False
-            Else
-                MRowSheet.MRows(mRow)("消費税率").Value = drJutyuMeisai("消費税率")
-                MRowSheet.MRows(mRow)("軽減税率").Value = drJutyuMeisai("軽減税率")
-            End If
+            MRowSheet.MRows(mRow)("消費税率").Value = drJutyuMeisai("消費税率")
+            MRowSheet.MRows(mRow)("軽減税率").Value = drJutyuMeisai("軽減税率")
             MRowSheet.MRows(mRow)("入数").Value = drJutyuMeisai("入数")
             MRowSheet.MRows(mRow)("セット数").Value = 0
             MRowSheet.MRows(mRow)("数量").Value = 0
@@ -5545,27 +5329,17 @@ Public Class frmNouhin
             MRowSheet.MRows(mRow)("備考").Value = drJutyuMeisai("備考").ToString
 
             MRowSheet.MRows(mRow)("単位").Value = drJutyuMeisai("単位").ToString
-            MRowSheet.MRows(mRow)("商品マスタNo").Value = drJutyuMeisai("商品マスタマスタNo")
+            MRowSheet.MRows(mRow)("商品マスタNo").Value = drJutyuMeisai("商品マスタNo")
             MRowSheet.MRows(mRow)("税抜原価単価").Value = drJutyuMeisai("税抜原価単価")
+            MRowSheet.MRows(mRow)("税込原価単価").Value = drJutyuMeisai("税込原価単価")
             MRowSheet.MRows(mRow)("税抜商品単価").Value = drJutyuMeisai("税抜商品単価")
-            If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.非課税 Then
-                MRowSheet.MRows(mRow)("税込原価単価").Value = drJutyuMeisai("税抜原価単価")
-                MRowSheet.MRows(mRow)("税込商品単価").Value = drJutyuMeisai("税抜商品単価")
-            Else
-                MRowSheet.MRows(mRow)("税込原価単価").Value = drJutyuMeisai("税込原価単価")
-                MRowSheet.MRows(mRow)("税込商品単価").Value = drJutyuMeisai("税込商品単価")
-            End If
+            MRowSheet.MRows(mRow)("税込商品単価").Value = drJutyuMeisai("税込商品単価")
             MRowSheet.MRows(mRow)("税抜金額").Value = 0
             MRowSheet.MRows(mRow)("税込金額").Value = 0
             MRowSheet.MRows(mRow)("税抜原価").Value = 0
             MRowSheet.MRows(mRow)("消費税").Value = 0
             MRowSheet.MRows(mRow)("商品税区分").Value = drJutyuMeisai("商品税区分")
-            MRowSheet.MRows(mRow)("在庫管理有効").Value = drJutyuMeisai("在庫管理有効")
-            MRowSheet.MRows(mRow)("消費税率区分").Value = drJutyuMeisai("消費税率区分")
             MRowSheet.MRows(mRow)("受注明細No").Value = drJutyuMeisai("テーブルNo")
-#If SanOka Then
-            MRowSheet.MRows(mRow)("出荷予定No").Value = 0  '*サンオカ*
-#End If
 
             If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.外税 Then
                 '得意先が外税の時は、税抜価格を表示
@@ -5586,16 +5360,31 @@ Public Class frmNouhin
                 MRowSheet.MRows(mRow)("金額").Lock = True
             End If
 
-            '在庫数のセットとチェック（実際の在庫数チェックは数量入力時に行なう）
-            If MRowSheet.MRows(mRow)("商品マスタNo").Value > 0 Then
+            '  商品マスタNoをキーに、商品マスタのレコードを得る
+            Dim drShouhin As DataRow = Nothing
+            If GetInt(MRowSheet.MRows(mRow)("商品マスタNo").Value) > 0 Then
+                Dim CShouhin As New HanbaikanriDialog.CShouhin()
+                drShouhin = CShouhin.GetMaster(GetInt(MRowSheet.MRows(mRow)("商品マスタNo").Value), cnTable)
+            End If
+            If drShouhin IsNot Nothing Then
+                MRowSheet.MRows(mRow)("在庫管理有効").Value = drShouhin("在庫管理有効")
+                MRowSheet.MRows(mRow)("消費税率区分").Value = drShouhin("消費税率区分")
+                '在庫数のセットとチェック（実際の在庫数チェックは数量入力時に行なう）
                 CheckZaiko(mRow, False)
+            Else
+                '商品マスタなしのためクリア
+                MRowSheet.MRows(mRow)("商品マスタNo").Value = 0
+                MRowSheet.MRows(mRow)("商品コード").Value = ""
+
+                MRowSheet.MRows(mRow)("在庫管理有効").Value = False
+                MRowSheet.MRows(mRow)("消費税率区分").Value = 0
             End If
         End Using
 
         Return True
     End Function
 
-    '仕入伝票・仕入明細からデータを取得し、納品伝票DataSetを作成する（Denpyouに内容をセット）（新規作成）
+    '仕入伝票・仕入明細からデータを得、納品伝票DataSetを作成する（Denpyouに内容をセット）
     '  戻値：  True=正常, False=データなし
     Private Function GetRecordSiire(ByVal tableNo As Integer) As Boolean
         Using cnTable As New SqlConnection(CSingleton.CSetting.Connect)
@@ -5610,14 +5399,10 @@ Public Class frmNouhin
             'TableNoをキーに仕入伝票・仕入明細からデータを得る
             Dim sSQL As String
             sSQL = "SELECT 仕入伝票.テーブルNo, 仕入伝票.コード, 仕入伝票.処理日, 仕入伝票.倉庫マスタNo, 仕入伝票.仕入先税区分, " _
-                 & "仕入明細.行番号, 仕入明細.商品税区分, 仕入明細.商品名称カナ, 仕入明細.商品名称, " _
+                 & "仕入明細.行番号, 仕入明細.商品マスタNo, 仕入明細.商品税区分, 仕入明細.商品コード, 仕入明細.商品名称カナ, 仕入明細.商品名称, " _
                  & "ISNULL(仕入明細.消費税率,0) AS 消費税率, 仕入明細.軽減税率, " _
-                 & "仕入明細.入数, 仕入明細.単位, 仕入明細.税抜商品単価, 仕入明細.税込商品単価, " _
-                 & "ISNULL(商品マスタ.マスタNo,0) AS 商品マスタマスタNo, 商品マスタ.コード AS 商品マスタコード, ISNULL(商品マスタ.税区分,0) AS 商品マスタ税区分, 商品マスタ.消費税率区分 AS 消費税率区分, " _
-                 & "ISNULL(倉庫マスタ.マスタNo,0) AS 倉庫マスタNo, 倉庫マスタ.コード AS 倉庫コード, 倉庫マスタ.名称 AS 倉庫名称 " _
+                 & "仕入明細.入数, 仕入明細.単位, 仕入明細.税抜商品単価, 仕入明細.税込商品単価 " _
                  & "FROM 仕入伝票 INNER JOIN 仕入明細 ON 仕入伝票.テーブルNo = 仕入明細.仕入伝票No " _
-                 & "LEFT OUTER JOIN 商品マスタ ON 仕入明細.商品マスタNo = 商品マスタ.マスタNo " _
-                 & "LEFT OUTER JOIN 倉庫マスタ ON 仕入伝票.倉庫マスタNo = 倉庫マスタ.マスタNo " _
                  & "WHERE 仕入伝票.テーブルNo = " & tableNo & " AND 仕入伝票.削除 = 0 AND 仕入明細.削除 = 0 " _
                  & "ORDER BY 仕入明細.行番号"
             Dim dtSiire As DataTable = CDBCommon.GetDataTable(cnTable, sSQL)
@@ -5633,10 +5418,19 @@ Public Class frmNouhin
             With Denpyou
                 .SiireDenpyouNo = drSiire("テーブルNo")
                 .SiireCode = drSiire("コード").ToString
+
+                '倉庫マスタNoをキーに、倉庫マスタのレコードを得る
                 With .Souko
-                    .MasterNo = drSiire("倉庫マスタNo")
-                    .Code = drSiire("倉庫コード").ToString
-                    .Name = drSiire("倉庫名称").ToString
+                    .MasterNo = GetInt(drSiire("倉庫マスタNo"))
+                    Dim CSouko As New HanbaikanriDialog.CSouko()
+                    Dim drSouko As DataRow = CSouko.GetMaster(.MasterNo, cnTable)
+                    If drSouko IsNot Nothing Then
+                        .Code = drSouko("コード").ToString
+                        .Name = drSouko("名称").ToString
+                    Else
+                        .Code = ""
+                        .Name = ""
+                    End If
                 End With
             End With
 
@@ -5658,32 +5452,48 @@ Public Class frmNouhin
             End If
 
             '  納品明細 追加
-            '　　手入力で消費税率を変更していた場合はマスタの設定に戻り、金額が変わるため注意（SetFormのRecalcで再設定と再計算）
             Dim rowNewMeisai As DataRow
             For iRow As Integer = 0 To dtSiire.Rows.Count - 1
                 Dim drSiireMeisai As DataRow = dtSiire.Rows(iRow)
 
                 rowNewMeisai = dtMeisai.NewRow      '行を生成
 
-                rowNewMeisai("商品コード") = drSiireMeisai("商品マスタコード").ToString
+                rowNewMeisai("商品コード") = drSiireMeisai("商品コード").ToString
                 rowNewMeisai("商品名称カナ") = drSiireMeisai("商品名称カナ").ToString
                 rowNewMeisai("商品名称") = drSiireMeisai("商品名称").ToString
-                rowNewMeisai("消費税率") = drSiireMeisai("消費税率")
-                rowNewMeisai("軽減税率") = drSiireMeisai("軽減税率")
+                If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.非課税 Then
+                    rowNewMeisai("消費税率") = 0
+                    rowNewMeisai("軽減税率") = False
+                Else
+                    rowNewMeisai("消費税率") = drSiireMeisai("消費税率")
+                    rowNewMeisai("軽減税率") = drSiireMeisai("軽減税率")
+                End If
                 rowNewMeisai("入数") = drSiireMeisai("入数")
                 rowNewMeisai("セット数") = 0
                 rowNewMeisai("数量") = 0
                 rowNewMeisai("単位") = drSiireMeisai("単位").ToString
 
-                '税抜/税込原価単価のセット（SetFormのReCalcで計算し直す）
-                rowNewMeisai("税抜原価単価") = drSiireMeisai("税抜商品単価")
-                If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.非課税 Then
-                    rowNewMeisai("税込原価単価") = drSiireMeisai("税抜商品単価")
-                Else
-                    rowNewMeisai("税込原価単価") = drSiireMeisai("税込商品単価")
+                '税抜/税込原価単価のセット
+                Dim genkaTankaNuki As Decimal = drSiireMeisai("税抜商品単価")
+                Dim genkaTankaKomi As Decimal = drSiireMeisai("税込商品単価")
+                If GetByte(drSiire("仕入先税区分")) = enZeikubun.非課税 Then
+                    genkaTankaKomi = GetZeikomiFromZeinuki(genkaTankaNuki, GetByte(drJisha("買掛単価少数桁数")), Denpyou.Tokuisaki.Hasuu, drSiireMeisai("消費税率"))
                 End If
+                If GetByte(drSiireMeisai("商品税区分")) = enZeikubun.非課税 Then
+                    genkaTankaKomi = genkaTankaNuki
+                End If
+                '  得意先の税区分により、原価単価をセット
+                Select Case Denpyou.Tokuisaki.ZeiKubun
+                    Case enZeikubun.外税, enZeikubun.内税
+                        rowNewMeisai("税抜原価単価") = genkaTankaNuki
+                        rowNewMeisai("税込原価単価") = genkaTankaKomi
 
-                rowNewMeisai("税抜商品単価") = 0  '単価はSetFormで取得しセット
+                    Case enZeikubun.非課税
+                        rowNewMeisai("税抜原価単価") = genkaTankaNuki
+                        rowNewMeisai("税込原価単価") = genkaTankaNuki
+                End Select
+
+                rowNewMeisai("税抜商品単価") = 0
                 rowNewMeisai("税込商品単価") = 0
                 rowNewMeisai("税抜金額") = 0
                 rowNewMeisai("税込金額") = 0
@@ -5694,14 +5504,11 @@ Public Class frmNouhin
                 rowNewMeisai("テーブルNo") = 0
                 rowNewMeisai("納品伝票No") = rowNewDenpyou("テーブルNo") '納品明細の納品伝票Noに納品伝票のテーブルNoをセット
                 rowNewMeisai("行番号") = drSiireMeisai("行番号")
-                rowNewMeisai("商品マスタNo") = drSiireMeisai("商品マスタマスタNo")
+                rowNewMeisai("商品マスタNo") = GetInt(drSiireMeisai("商品マスタNo"))
                 rowNewMeisai("商品税区分") = GetByte(drSiireMeisai("商品税区分"))
                 If My.Settings.HanbaiKanriType = "C" Then
                     rowNewMeisai("受注明細No") = 0
                 End If
-#If SanOka Then
-                rowNewMeisai("出荷予定No") = 0  '*サンオカ*
-#End If
 
                 dtMeisai.Rows.Add(rowNewMeisai)  '行をDataTableに追加
             Next
@@ -5902,18 +5709,6 @@ Public Class frmNouhin
                         End If
                     End If
                 End If
-
-#If SanOka Then
-                '*サンオカ*　出荷予定表から連動した行には、受注コードのセルノートに、出荷予定日を表示する
-                MRowSheet.MRows(mRow)("受注コード").Note = Nothing
-                If MRowSheet.MRows(mRow)("出荷予定No").Value > 0 Then
-                    Dim sSQL As String = "SELECT 出荷日 FROM 出荷予定 WHERE テーブルNo = " & MRowSheet.MRows(mRow)("出荷予定No").Value
-                    Dim shukkaDate As String = CDBCommon.SQLExecuteScalar(CSingleton.CSetting.Connect, sSQL)
-                    If shukkaDate IsNot Nothing Then
-                        CFormCommon.SetSelNote(MRowSheet.MRows(mRow)("受注コード"), "出荷予定日：" & DateYearFormat(shukkaDate, drJisha("和暦")))
-                    End If
-                End If
-#End If
             End If
 
             '  商品マスタNoをキーに、商品マスタのレコードを得る
@@ -5952,7 +5747,7 @@ Public Class frmNouhin
             Else   '商品マスタなし
                 MRowSheet.MRows(mRow).ErrorText = ""
                 MRowSheet.MRows(mRow)("在庫管理有効").Value = False
-                MRowSheet.MRows(mRow)("消費税率区分").Value = enTaxRateKubun.税率1
+                MRowSheet.MRows(mRow)("消費税率区分").Value = 0
 
                 If AfterSerch Then  'GetRecord後の時
                     '新規の時（複写、コピー、XX参照等）、商品マスタなしなのに商品がセットされていたらクリア
@@ -5986,11 +5781,7 @@ Public Class frmNouhin
 
             If AfterSerch Then  'GetRecord後の時
                 'デフォルト商品を付加（金額/数量は入力されているが、商品がセットされていない行に、デフォルト商品をセットする）
-                '（検索時、既存データの消費税率は変更せず、デフォルト商品の付加のみ行う）
-                '（複写/コピー/XX参照時は消費税率は元のままとする→消費税率変更時はSetForm後に計算し直す）
-                If SetDefaultShouhin(mRow, False) Then
-                    drShouhin = drDefaultShouhin  'デフォルト商品をセットした時、デフォルト商品のdrShouhinをセット（ReCalcMeisaiで使用）
-                End If
+                SetDefaultShouhin(mRow)
             End If
 
             '明細金額の再計算（税区分等の変更に対応）
@@ -6101,64 +5892,56 @@ Public Class frmNouhin
 
     '納品伝票の伝票コードを採番して返す
     Private Function GetDenpyouCode(ByVal masterNo As Integer) As Decimal
-        '新規登録した最新のデータを取得するSQL（①）（新規登録データは修正元テーブルNoがゼロ）
-        Dim sSQL1 As String
+        Dim sSQL As String
         If masterNo > 0 AndAlso Denpyou.Tokuisaki.DenpyouCodeFlag Then
             '伝票コードを個別にする時
-            sSQL1 = "SELECT TOP 1 納品伝票.テーブルNo, 納品伝票.削除, 納品伝票.コード " &
-                    "FROM (得意先マスタ INNER JOIN 納品伝票 ON 得意先マスタ.マスタNo = 納品伝票.得意先マスタNo) INNER JOIN 得意先マスタ AS 請求先 ON 得意先マスタ.請求先マスタNo = 請求先.マスタNo " &
-                    "WHERE 請求先.伝票コードフラグ = 1 AND 得意先マスタ.請求先マスタNo=" & masterNo & " " &
-                    "AND 納品伝票.修正元テーブルNo = 0 AND 納品伝票.テーブルNo < @テーブルNo " &
-                    "ORDER BY テーブルNo DESC"
+            sSQL = "SELECT TOP 1 納品伝票.テーブルNo, 納品伝票.[コード], 納品伝票.[修正元テーブルNo] " _
+                 & "FROM (得意先マスタ INNER JOIN 納品伝票 ON 得意先マスタ.マスタNo = 納品伝票.得意先マスタNo) INNER JOIN 得意先マスタ AS 請求先 ON 得意先マスタ.請求先マスタNo = 請求先.マスタNo " _
+                 & "WHERE 請求先.伝票コードフラグ = 1 AND 得意先マスタ.請求先マスタNo=" & masterNo & " AND 納品伝票.削除 = 0 " _
+                 & "AND 納品伝票.テーブルNo < @テーブルNo " _
+                 & "ORDER BY テーブルNo DESC"
         Else
             '伝票コードを個別にしない時
-            sSQL1 = "SELECT TOP 1 納品伝票.テーブルNo, 納品伝票.削除, 納品伝票.コード " &
-                    "FROM (得意先マスタ INNER JOIN 納品伝票 ON 得意先マスタ.マスタNo = 納品伝票.得意先マスタNo) INNER JOIN 得意先マスタ AS 請求先 ON 得意先マスタ.請求先マスタNo = 請求先.マスタNo " &
-                    "WHERE 請求先.伝票コードフラグ <> 1 " &
-                    "AND 納品伝票.修正元テーブルNo = 0 AND 納品伝票.テーブルNo < @テーブルNo " &
-                    "ORDER BY テーブルNo DESC"
+            sSQL = "SELECT TOP 1 納品伝票.テーブルNo, 納品伝票.[コード], 納品伝票.[修正元テーブルNo] " _
+                 & "FROM (得意先マスタ INNER JOIN 納品伝票 ON 得意先マスタ.マスタNo = 納品伝票.得意先マスタNo) INNER JOIN 得意先マスタ AS 請求先 ON 得意先マスタ.請求先マスタNo = 請求先.マスタNo " _
+                 & "WHERE 請求先.伝票コードフラグ <> 1 AND 納品伝票.削除 = 0 " _
+                 & "AND 納品伝票.テーブルNo < @テーブルNo " _
+                 & "ORDER BY テーブルNo DESC"
         End If
 
-        '①で取得したデータの削除していないデータを探すSQL（修正元テーブルNoをたどってさがす）
-        Dim sSQL2 As String
-        sSQL2 = "SELECT テーブルNo, 削除, コード " &
-                "FROM 納品伝票 " &
-                "WHERE 修正元テーブルNo = @修正元テーブルNo "
-
         '伝票コード採番
-        Return CDenpyouCommon.GetDenpyouCode(sSQL1, sSQL2, drJisha("納品伝票コード桁数"))
+        Return CDenpyouCommon.GetDenpyouCode(sSQL, drJisha("納品伝票コード桁数"))
     End Function
 
     '伝票コードが自動更新でない時、伝票コードの重複チェックを行う
-    Private Function CheckDenpyouCode(Optional ByVal whenUpdateRec As Boolean = False) As Boolean
-        If Denpyou.Tokuisaki.DenpyouCodeUpdate Then Return True  '伝票コード自動更新なら重複チェックしない
+    Private Function CheckDenpyouCode(Optional ByVal whenUpdateRec As Boolean = False, Optional ByRef connection As SqlConnection = Nothing) As Boolean
+        '伝票コード自動更新なら重複チェックしない
+        If Denpyou.Tokuisaki.DenpyouCodeUpdate Then
+            Return True
+        End If
 
-        Using cnTable As New SqlConnection(CSingleton.CSetting.Connect)
-            cnTable.Open()
-            Return CheckDenpyouCode(cnTable, whenUpdateRec)
-        End Using
-    End Function
-    Private Function CheckDenpyouCode(ByRef connection As SqlConnection, Optional ByVal whenUpdateRec As Boolean = False) As Boolean
-        If Denpyou.Tokuisaki.DenpyouCodeUpdate Then Return True  '伝票コード自動更新なら重複チェックしない
-
-        '伝票コードの重複チェックを行い、重複ならFalseを返す
         Dim sSQL As String
         If Denpyou.Tokuisaki.DenpyouCodeFlag Then
             '伝票コードを個別にする時
-            sSQL = "SELECT TOP 1 納品伝票.コード " &
-                   "FROM 納品伝票 INNER JOIN 得意先マスタ ON 納品伝票.得意先マスタNo = 得意先マスタ.マスタNo " &
-                   "WHERE 納品伝票.コード = @コード AND 納品伝票.削除 = 0 " &
-                   "AND 得意先マスタ.請求先マスタNo = " & Denpyou.Tokuisaki.SeikyuSaki & " " &
-                   If(Denpyou.TableNo > 0, "AND テーブルNo <> @テーブルNo ", "")
+            sSQL = "SELECT 納品伝票.コード " _
+                 & "FROM 納品伝票 INNER JOIN 得意先マスタ ON 納品伝票.得意先マスタNo = 得意先マスタ.マスタNo " _
+                 & "WHERE 納品伝票.コード = '" & Denpyou.Code & "' " _
+                 & "AND 得意先マスタ.請求先マスタNo = " & Denpyou.Tokuisaki.SeikyuSaki & " " _
+                 & "AND 納品伝票.削除 = 0"
         Else
             '伝票コードを個別にしない時
-            sSQL = "SELECT TOP 1 納品伝票.コード " &
-                   "FROM 納品伝票 INNER JOIN (得意先マスタ INNER JOIN 得意先マスタ AS 請求先 ON 得意先マスタ.請求先マスタNo = 請求先.マスタNo) ON 納品伝票.得意先マスタNo = 得意先マスタ.マスタNo " &
-                   "WHERE 納品伝票.コード = @コード AND 納品伝票.削除 = 0 " &
-                   "AND 請求先.伝票コードフラグ = 0 " &
-                   If(Denpyou.TableNo > 0, "AND テーブルNo <> @テーブルNo ", "")
+            sSQL = "SELECT 納品伝票.コード " _
+                 & "FROM 納品伝票 INNER JOIN (得意先マスタ INNER JOIN 得意先マスタ AS 請求先 ON 得意先マスタ.請求先マスタNo = 請求先.マスタNo) ON 納品伝票.得意先マスタNo = 得意先マスタ.マスタNo " _
+                 & "WHERE 納品伝票.コード = '" & Denpyou.Code & "' " _
+                 & "AND 請求先.伝票コードフラグ = 0 " _
+                 & "AND 納品伝票.削除 = 0"
         End If
-        Return CDenpyouCommon.CheckDenpyouCodeDuplicate(connection, sSQL, Denpyou.TableNo, edtDenpyouCode, whenUpdateRec)
+        If Denpyou.TableNo > 0 Then
+            sSQL &= " AND テーブルNo <> " & Denpyou.TableNo
+        End If
+
+        '伝票コードの重複チェックを行い、重複ならFalseを返す
+        Return CDenpyouCommon.CheckDenpyouCodeDuplicate(connection, sSQL, edtDenpyouCode, whenUpdateRec)
     End Function
 
     '参照元の伝票コードを得る
@@ -6227,8 +6010,8 @@ Public Class frmNouhin
         MRowSheet.MRows(mRow)("税込金額").Value = 0
         MRowSheet.MRows(mRow)("税抜原価").Value = 0
         MRowSheet.MRows(mRow)("消費税").Value = 0
-        MRowSheet.MRows(mRow)("商品税区分").Value = enZeikubun.外税
-        MRowSheet.MRows(mRow)("消費税率区分").Value = enTaxRateKubun.税率1
+        MRowSheet.MRows(mRow)("商品税区分").Value = 0
+        MRowSheet.MRows(mRow)("消費税率区分").Value = 0
         MRowSheet.MRows(mRow)("在庫管理有効").Value = False
         MRowSheet.MRows(mRow)("在庫数チェック").Value = True
         MRowSheet.MRows(mRow)("在庫数").Value = 0
@@ -6237,19 +6020,8 @@ Public Class frmNouhin
         If My.Settings.HanbaiKanriType = "C" Then
             MRowSheet.MRows(mRow)("受注明細No").Value = 0
         End If
-#If SanOka Then
-        MRowSheet.MRows(mRow)("出荷予定No").Value = 0  '*サンオカ*
-#End If
 
         SetSheetPlus(True, mRow)  '明細入力は、プラスのみ可能とする
-    End Sub
-
-    '明細行の個別設定（シートの行をMove/Copyする時は、セルの個別設定がある場合は先に設定しておかないと値がセットされない。その項目以降の値が壊れてしまうので注意。）
-    '　orgMrow：設定元の行、newMrow：設定先の行
-    Private Sub SettingMrow(ByVal orgMrow As Integer, ByVal newMrow As Integer)
-        '消費税率：個々のセルに設定してある
-        Dim orgCmbEditor As GrapeCity.Win.ElTabelle.Editors.SuperiorComboEditor = MRowSheet.MRows(orgMrow)("消費税率").Editor
-        MRowSheet.MRows(newMrow)("消費税率").Editor = orgCmbEditor
     End Sub
 
     '得意先別単価の登録（請求先に登録）
@@ -6403,8 +6175,11 @@ Public Class frmNouhin
             ChangeShouhin(True, mRow, CFormCommon.MasterDataRow)  '選択された商品の内容からSheetの内容を置き換える
             UpdateFlagOn()
 
-            'カーソル移動
-            If My.Settings.EndUserName = "信和通信工業株式会社" AndAlso MRowSheet.MRows(mRow)("商品名称").Text.Trim = "" Then
+            'カーソル移動（セルの移動はFindShouhinで。CanActivateの設定はLeaveCellで。商品検索ボタンの時はCanActivateを設定しないようにするため。）
+            If My.Settings.EndUserName = "株式会社　日の出" Then
+                '*日の出*  商品後、商品名称にカーソル移動させる
+                MRowSheet.ActiveCellKey = "商品名称"  'セルの移動
+            ElseIf My.Settings.EndUserName = "信和通信工業株式会社" AndAlso MRowSheet.MRows(mRow)("商品名称").Text.Trim = "" Then
                 '*信和*  商品名称未設定の商品時、商品名称にカーソル移動
                 MRowSheet.ActiveCellKey = "商品名称"  'セルの移動
                 'ElseIf My.Settings.EndUserName = "有限会社山田商店" Then
@@ -6481,10 +6256,14 @@ Public Class frmNouhin
                             UpdateFlagOn()
                             'カーソル移動
                             If MRowSheet.MRows(mRow)("入数").Value = 0 Then
-                                MRowSheet.ActiveCellKey = "数量"
+                                MRowSheet.ActiveCellKey = "数量"    'セルの移動
+                                MRowSheet.MRows(mRow)("入数").CanActivate = False
+                                MRowSheet.MRows(mRow)("セット数").CanActivate = False
                             Else
-                                MRowSheet.ActiveCellKey = "セット数"
+                                MRowSheet.ActiveCellKey = "セット数"    'セルの移動
+                                MRowSheet.MRows(mRow)("入数").CanActivate = False
                             End If
+                            MRowSheet.MRows(mRow)("商品コード").CanActivate = False
                             Return True
                         End If
                     End If
@@ -6512,9 +6291,13 @@ Public Class frmNouhin
                 'カーソル移動
                 If MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("入数").Value = 0 Then
                     MRowSheet.ActiveCellKey = "数量"    'セルの移動
+                    MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("入数").CanActivate = False
+                    MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("セット数").CanActivate = False
                 Else
                     MRowSheet.ActiveCellKey = "セット数"    'セルの移動
+                    MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("入数").CanActivate = False
                 End If
+                MRowSheet.MRows(MRowSheet.ActivePosition.MRow)("商品コード").CanActivate = False
                 Me.BringToFront()  '最前面に表示する
             End If
             SheetRedrawON()
@@ -6526,7 +6309,7 @@ Public Class frmNouhin
     Private Sub ChangeTokuiCode(ByVal Exist As Boolean, ByVal drTokui As DataRow)
         If Exist Then
             '得意先が存在する時
-            'Denpyou.SiireDenpyouNo = 0    '仕入伝票参照も無しとする（原価単価の端数が狂ってしまうことがあるため）
+            Denpyou.SiireDenpyouNo = 0    '仕入伝票参照も無しとする（原価単価の端数が狂ってしまうことがあるため）
 
             Denpyou.Tokuisaki.MasterNo = drTokui("マスタNo")
             Denpyou.Tokuisaki.Code = drTokui("コード").ToString
@@ -6621,7 +6404,7 @@ Public Class frmNouhin
                     Denpyou.KoumokuSu = MaxKoumoku
                 End If
             End If
-            If Denpyou.TableNo <= 0 Then  '新規のときだけ伝票コードを設定する
+            If Denpyou.TableNo = 0 Then  '新規のときだけ伝票コードを設定する
                 Denpyou.Code = Denpyou.NewCode.ToString(New String("0", drJisha("納品伝票コード桁数")))
             End If
 
@@ -6786,11 +6569,10 @@ Public Class frmNouhin
             MRowSheet.MRows(mRow)("商品名称カナ").Value = drShouhin("名称カナ").ToString
             If My.Settings.EndUserName = "株式会社サンオカ" Then
                 '*サンオカ*　入数/セット数を使用しない
-                MRowSheet.MRows(mRow)("入数").Value = 0
             Else
                 MRowSheet.MRows(mRow)("入数").Value = GetDecimal(drShouhin("入数"))
+                MRowSheet.MRows(mRow)("セット数").Value = 0
             End If
-            MRowSheet.MRows(mRow)("セット数").Value = 0
             MRowSheet.MRows(mRow)("単位IN").Value = Nothing  'クリアしておかないと、単位が""の時クリアされない
             MRowSheet.MRows(mRow)("単位IN").Text = drShouhin("単位").ToString
             MRowSheet.MRows(mRow)("単位").Value = drShouhin("単位").ToString
@@ -6838,19 +6620,13 @@ Public Class frmNouhin
                 SetGenka(mRow, drShouhin)
             End If
 
-            If My.Settings.EndUserName = "株式会社サンオカ" Then
-                '*サンオカ*　数量はクリアせず、新単価で金額を再計算する
-                SetKingaku(mRow, MRowSheet.MRows(mRow)("商品単価").Value, MRowSheet.MRows(mRow)("数量").Value)
-                MRowSheet.MRows(mRow)("税抜原価").Value = CDenpyouCommon.GetCalcGenkaKingaku(MRowSheet.MRows(mRow)("税抜原価単価").Value, MRowSheet.MRows(mRow)("数量").Value, Denpyou.Tokuisaki.Hasuu)
-            Else
-                '数量、金額、原価クリア
-                MRowSheet.MRows(mRow)("数量").Value = 0
-                MRowSheet.MRows(mRow)("金額").Value = 0
-                MRowSheet.MRows(mRow)("税込金額").Value = 0
-                MRowSheet.MRows(mRow)("税抜金額").Value = 0
-                MRowSheet.MRows(mRow)("税抜原価").Value = 0
-                MRowSheet.MRows(mRow)("消費税").Value = 0
-            End If
+            '  数量、金額、原価クリア
+            MRowSheet.MRows(mRow)("数量").Value = 0
+            MRowSheet.MRows(mRow)("金額").Value = 0
+            MRowSheet.MRows(mRow)("税込金額").Value = 0
+            MRowSheet.MRows(mRow)("税抜金額").Value = 0
+            MRowSheet.MRows(mRow)("税抜原価").Value = 0
+            MRowSheet.MRows(mRow)("消費税").Value = 0
 
         Else
             '商品が存在しない時
@@ -6869,8 +6645,8 @@ Public Class frmNouhin
             MRowSheet.MRows(mRow)("税込商品単価").Value = 0
             MRowSheet.MRows(mRow)("税抜原価単価").Value = 0
             MRowSheet.MRows(mRow)("税込原価単価").Value = 0
-            MRowSheet.MRows(mRow)("商品税区分").Value = enZeikubun.外税
-            MRowSheet.MRows(mRow)("消費税率区分").Value = enTaxRateKubun.税率1
+            MRowSheet.MRows(mRow)("商品税区分").Value = 0
+            MRowSheet.MRows(mRow)("消費税率区分").Value = 0
             MRowSheet.MRows(mRow)("得意先別単価").Value = 0
             MRowSheet.MRows(mRow)("在庫管理有効").Value = False
             MRowSheet.MRows(mRow)("在庫数チェック").Value = False
@@ -6882,8 +6658,6 @@ Public Class frmNouhin
             MRowSheet.MRows(mRow)("税抜金額").Value = 0
             MRowSheet.MRows(mRow)("税抜原価").Value = 0
             MRowSheet.MRows(mRow)("消費税").Value = 0
-
-            MRowSheet.MRows(mRow)("金額").Lock = False
         End If
 
         '合計金額の再計算
@@ -7087,40 +6861,25 @@ Public Class frmNouhin
     End Sub
 
     'デフォルト商品を付加（金額/数量は入力されているが、商品がセットされていない行に、デフォルト商品をセットする）
-    Private Function SetDefaultShouhin(ByVal mRow As Integer, Optional ByVal isSetTaxRate As Boolean = True) As Boolean
-        If defaultShouhinNo <= 0 Then Return False
-        If GetInt(MRowSheet.MRows(mRow)("商品マスタNo").Value) > 0 Then Return False
+    Private Sub SetDefaultShouhin(ByVal mRow As Integer)
+        If defaultShouhin.MasterNo <= 0 Then Exit Sub
+        If GetInt(MRowSheet.MRows(mRow)("商品マスタNo").Value) > 0 Then Exit Sub
 
         If MRowSheet.MRows(mRow)("金額").Value <> 0 OrElse MRowSheet.MRows(mRow)("数量").Value <> 0 Then  '金額/数量が入力されている行の時
-            MRowSheet.MRows(mRow)("商品マスタNo").Value = defaultShouhinNo
-            MRowSheet.MRows(mRow)("商品コード").Value = drDefaultShouhin("コード").ToString
-            MRowSheet.MRows(mRow)("商品税区分").Value = drDefaultShouhin("税区分")
-            MRowSheet.MRows(mRow)("消費税率区分").Value = drDefaultShouhin("消費税率区分")
-
-            If isSetTaxRate = False Then
-                '消費税率を変更しない
-                '（検索時、既存データの消費税率は変更せず、デフォルト商品の付加のみ行う）
-                '（複写入力/XX参照等で新規作成時は、参照元の消費税率を変更しない→消費税率変更時はSetForm後に計算し直す）
-                Return True
-            End If
+            MRowSheet.MRows(mRow)("商品マスタNo").Value = defaultShouhin.MasterNo
+            MRowSheet.MRows(mRow)("商品コード").Value = defaultShouhin.Code
+            MRowSheet.MRows(mRow)("商品税区分").Value = defaultShouhin.ZeiKubun
+            MRowSheet.MRows(mRow)("消費税率区分").Value = defaultShouhin.TaxRateKubun
 
             Dim taxRate As Tuple(Of Decimal, Boolean) = CDenpyouCommon.GetTaxRate(Denpyou.Tokuisaki.ZeiKubun, MRowSheet.MRows(mRow)("商品税区分").Value, Denpyou.SeikyuDate, Denpyou.aryRate, MRowSheet.MRows(mRow)("消費税率区分").Value)
-            If MRowSheet.MRows(mRow)("消費税率").Value = taxRate.Item1 AndAlso MRowSheet.MRows(mRow)("軽減税率").Value = taxRate.Item2 Then
-                Return True  '消費税率は変わっていないため、計算し直さない
-            End If
-
             MRowSheet.MRows(mRow)("消費税率").Value = taxRate.Item1
             MRowSheet.MRows(mRow)("軽減税率").Value = taxRate.Item2
             MRowSheet.MRows(mRow)("消費税率").Note = Nothing
             MRowSheet.MRows(mRow)("軽減税率").Note = Nothing
 
             ChangeTaxRate(mRow)
-
-            Return True  'デフォルト商品をセットした
         End If
-
-        Return False  'デフォルト商品をセットしていない
-    End Function
+    End Sub
 
     '消費税率マスタより、明細シートの消費税率コンボボックスを設定（消費税マスタの税率と0%を設定）
     '（シートのテンプレートを設定し直すと、他の値が消えることがあるためセルに設定）
@@ -7223,9 +6982,6 @@ Public Class frmNouhin
                 MRowSheet.MRows(mRow)("消費税率").Value = CDec(0)
             End If
 
-            MRowSheet.MRows(mRow)("消費税率").Note = Nothing
-            MRowSheet.MRows(mRow)("軽減税率").Note = Nothing
-
             If MRowSheet.MRows(mRow)("商品単価").Value <> 0 Then
                 '商品単価が入力済の時
                 '  変更前の税区分で単価を得る
@@ -7311,11 +7067,23 @@ Public Class frmNouhin
 
     '原価単価、税抜原価を、入力した原価単価から再計算してセット
     Private Sub ReCalcMeisai_GenkaIn(ByVal mRow As Integer)
-        '原価単価のセット（手入力した原価単価から税抜/税込原価単価を再計算）
-        Dim tanka As CDenpyouCommon.strctZeinukiZeikomi = CDenpyouCommon.GetRecalcKingakuIn(MRowSheet.MRows(mRow)("税抜原価単価").Value, MRowSheet.MRows(mRow)("税込原価単価").Value, MRowSheet.MRows(mRow)("商品税区分").Value, Denpyou.Tokuisaki.ZeiKubun, Denpyou.Tokuisaki.Hasuu, GetByte(drJisha("買掛単価少数桁数")), MRowSheet.MRows(mRow)("消費税率").Value)
-        MRowSheet.MRows(mRow)("原価単価").Value = tanka.Kingaku
-        MRowSheet.MRows(mRow)("税抜原価単価").Value = tanka.ZeinukiGaku
-        MRowSheet.MRows(mRow)("税込原価単価").Value = tanka.ZeikomiGaku
+        If Denpyou.SiireDenpyouNo = 0 OrElse DirectCast(oldAryRate, IStructuralEquatable).Equals(Denpyou.aryRate, StructuralComparisons.StructuralEqualityComparer) = False Then
+            '仕入参照でない時、または消費税率が変わった時
+            '　原価単価のセット（手入力した原価単価から税抜/税込原価単価を再計算）
+            Dim tanka As CDenpyouCommon.strctZeinukiZeikomi = CDenpyouCommon.GetRecalcKingakuIn(MRowSheet.MRows(mRow)("税抜原価単価").Value, MRowSheet.MRows(mRow)("税込原価単価").Value, MRowSheet.MRows(mRow)("商品税区分").Value, Denpyou.Tokuisaki.ZeiKubun, Denpyou.Tokuisaki.Hasuu, GetByte(drJisha("買掛単価少数桁数")), MRowSheet.MRows(mRow)("消費税率").Value)
+            MRowSheet.MRows(mRow)("原価単価").Value = tanka.Kingaku
+            MRowSheet.MRows(mRow)("税抜原価単価").Value = tanka.ZeinukiGaku
+            MRowSheet.MRows(mRow)("税込原価単価").Value = tanka.ZeikomiGaku
+
+        Else
+            '仕入参照で消費税率変更なしの時、表示のみ切り替え
+            '  表示する原価単価のセット
+            If Denpyou.Tokuisaki.ZeiKubun = enZeikubun.外税 Then
+                MRowSheet.MRows(mRow)("原価単価").Value = MRowSheet.MRows(mRow)("税抜原価単価").Value
+            Else
+                MRowSheet.MRows(mRow)("原価単価").Value = MRowSheet.MRows(mRow)("税込原価単価").Value
+            End If
+        End If
 
         '税抜原価セット
         MRowSheet.MRows(mRow)("税抜原価").Value = CDenpyouCommon.GetCalcGenkaKingaku(MRowSheet.MRows(mRow)("税抜原価単価").Value, MRowSheet.MRows(mRow)("数量").Value, Denpyou.Tokuisaki.Hasuu)
@@ -7420,10 +7188,8 @@ Public Class frmNouhin
 
     '最小在庫数のチェックを行う
     Private Sub CheckMinZaiko(ByVal mRow As Integer, ByVal Suryou As Decimal)
-        If MRowSheet.MRows(mRow).ErrorText <> "" AndAlso
-          MRowSheet.MRows(mRow).ErrorText <> "商品が足りません" AndAlso
-          MRowSheet.MRows(mRow).ErrorText <> "商品の在庫数が最小在庫数を下回ります" Then
-            '既に商品在庫マスタのエラーなので、チェックしない（商品が足りないエラー時は、再度チェックするためExit Subしない）
+        If MRowSheet.MRows(mRow).ErrorText <> "" Then
+            '既に商品在庫マスタのエラーなので、チェックしない
             Exit Sub
         End If
         MRowSheet.MRows(mRow).ErrorText = ""
@@ -7439,15 +7205,14 @@ Public Class frmNouhin
             Exit Sub
         End If
 
-        '※他行に同じ商品があった場合は考慮していない。既存データの数量変更の場合、変更前数量との差では計算していない。在庫元帳計算が終了していて在庫数が計算されている前提。
         Dim NewZaikoSu As Decimal = MRowSheet.MRows(mRow)("在庫数").Value - Suryou
         Dim MinZaikoSu As Decimal = MRowSheet.MRows(mRow)("最小在庫数").Value
 
         MRowSheet.MRows(mRow).ErrorIcon = New Icon(My.Resources.StatusWarning, 16, 16)
         If NewZaikoSu < 0 Then
-            MRowSheet.MRows(mRow).ErrorText = "商品が足りません"  '（文言をチェックに使用しているため、変更する時は注意）
+            MRowSheet.MRows(mRow).ErrorText = "商品が足りません"
         ElseIf NewZaikoSu < MinZaikoSu Then
-            MRowSheet.MRows(mRow).ErrorText = "商品の在庫数が最小在庫数を下回ります"  '（文言をチェックに使用しているため、変更する時は注意）
+            MRowSheet.MRows(mRow).ErrorText = "商品の在庫数が最小在庫数を下回ります"
         End If
     End Sub
 
@@ -7466,7 +7231,7 @@ Public Class frmNouhin
     '商品単価、原価単価が最新の単価と同じかどうかチェックし、違う時はワーニングを表示する
     Private Sub CheckNewTanka()
         For mRow As Integer = 0 To MRowSheet.MaxMRows - 1
-            If MRowSheet.MRows(mRow)("商品マスタNo").Value = 0 OrElse MRowSheet.MRows(mRow)("商品マスタNo").Value = defaultShouhinNo Then
+            If MRowSheet.MRows(mRow)("商品マスタNo").Value = 0 OrElse MRowSheet.MRows(mRow)("商品マスタNo").Value = defaultShouhin.MasterNo Then
                 Continue For  '商品未入力行の時、商品がデフォルト商品の時はチェックしない
             End If
             'If DataInSheet(mRow, MRowSheet) = False OrElse MRowSheet.MRows(mRow)("商品マスタNo").Value = 0 Then
@@ -7504,7 +7269,7 @@ Public Class frmNouhin
         End If
 
         For mRow As Integer = 0 To MRowSheet.MaxMRows - 1
-            If MRowSheet.MRows(mRow)("商品マスタNo").Value = 0 OrElse MRowSheet.MRows(mRow)("商品マスタNo").Value = defaultShouhinNo Then
+            If MRowSheet.MRows(mRow)("商品マスタNo").Value = 0 OrElse MRowSheet.MRows(mRow)("商品マスタNo").Value = defaultShouhin.MasterNo Then
                 Continue For  '商品未入力行の時、商品がデフォルト商品の時はチェックしない
             End If
             'If DataInSheet(iRow, MRowSheet) = False OrElse MRowSheet.MRows(iRow)("商品マスタNo").Value = 0 Then
@@ -7614,12 +7379,11 @@ Public Class frmNouhin
         toolBtnInsertRow.Enabled = isEnabled                    '行挿入
         mnuInsertRow.Enabled = isEnabled                        '編集→行挿入
         toolBtnDelete.Enabled = isEnabled                       '伝票削除
-        toolBtnCopyRow.Enabled = isEnabled                      '行コピー 
-        mnuCopyRow.Enabled = isEnabled                          '編集→行コピー 
         mnuDelete.Enabled = isEnabled                           'ファイル→削除
         toolBtnPrint.Enabled = isEnabled                        '印刷
         mnuPrintMenu.Enabled = isEnabled                        '納品伝票印刷
         toolBtnPreview.Enabled = isEnabled                      'プレビュー
+        toolBtnRyoushuSho.Enabled = isEnabled                   '領収書  *信和*
         toolBtnCopyNew.Enabled = isEnabled                      'コピー
         mnuCopyNew.Enabled = isEnabled                          '編集→コピー
         toolBtnTankaRireki.Enabled = isEnabled                  '単価履歴
@@ -7642,13 +7406,8 @@ Public Class frmNouhin
         mnuJutyu.Enabled = isNewInputtable                      '検索→受注参照
         edtTokuiCode.Enabled = isNewInputtable                  '得意先コード
         btnSearchTokui.Enabled = isNewInputtable                '得意先検索
-        If My.Settings.EndUserName = "株式会社サンオカ" Then
-            '*サンオカ*　得意先変更も可能とする（出荷予定表から来た時変更できるように）
-            edtTokuiCode.Enabled = True                         '得意先コード
-            btnSearchTokui.Enabled = True                       '得意先検索
-        End If
 
-        If Denpyou.Tokuisaki.MasterNo <= 0 Then
+        If Denpyou.Tokuisaki.MasterNo = 0 Then
             toolBtnSiire.Enabled = False                        '仕入参照
             mnuSiire.Enabled = False                            '仕入参照
         Else
@@ -7656,10 +7415,13 @@ Public Class frmNouhin
             mnuSiire.Enabled = isNewInputtable                  '仕入参照
         End If
 
-        If My.Settings.EndUserName = "信和通信工業株式会社" Then
-            '*信和*　領収書あり
-            btnPrintRyoushuSho.Enabled = isEnabled               '領収書  
-            btnPreviewRyoushuSho.Enabled = isEnabled             '領収書プレビュー 
+        '日の出は、登録ボタンを青/赤に
+        If My.Settings.EndUserName = "株式会社　日の出" Then
+            If toolBtnUpdate.Enabled Then
+                toolBtnUpdate.BackColor = Color.FromArgb(242, 0, 0)  '赤
+            Else
+                toolBtnUpdate.BackColor = Color.LightSkyBlue  '青
+            End If
         End If
     End Sub
 
