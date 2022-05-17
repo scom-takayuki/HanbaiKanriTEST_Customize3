@@ -1,0 +1,1191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4F9F3B0B-37D0-4A70-AF3D-EDB0845D5560}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>販売管理C.My.MyApplication</StartupObject>
+    <RootNamespace>販売管理C</RootNamespace>
+    <AssemblyName>販売管理5_1B</AssemblyName>
+    <MyType>WindowsForms</MyType>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <ApplicationIcon>HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\販売管理5.ico</ApplicationIcon>
+    <ManifestCertificateThumbprint>A749BEAD90B58C38EEB15C87208BD4D68BB7CFCA</ManifestCertificateThumbprint>
+    <ManifestKeyFile>販売管理5_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>true</SignManifests>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>\\SCOMSERVER\Development\HanbaiKanri-5_1\Base-B\Publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Unc</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>true</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <PublisherName>株式会社エスコム</PublisherName>
+    <MinimumRequiredVersion>1.0.0.0</MinimumRequiredVersion>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <ApplicationRevision>10</ApplicationRevision>
+    <ApplicationVersion>5.1.0.10</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>販売管理5_1B.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>販売管理5_1B.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>販売管理5_1B.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.vb</CodeAnalysisModuleSuppressionsFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>販売管理5_1B.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.vb</CodeAnalysisModuleSuppressionsFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GrapeCity.Excel, Version=4.0.2007.1225, Culture=neutral, PublicKeyToken=b0e38629244efa22" />
+    <Reference Include="GrapeCity.Win.BaseGrid.v40, Version=4.0.2007.1225, Culture=neutral, PublicKeyToken=a26afe6ac959b1f8" />
+    <Reference Include="GrapeCity.Win.Input.Postal.v40, Version=4.0.2006.224, Culture=neutral, PublicKeyToken=b4c7d92b26346b8d" />
+    <Reference Include="GrapeCity.Win.Input.v40, Version=4.0.2006.224, Culture=neutral, PublicKeyToken=c3bd7c1dccef5128" />
+    <Reference Include="GrapeCity.Win.MultiRow.v40, Version=4.0.2007.1225, Culture=neutral, PublicKeyToken=a26afe6ac959b1f8" />
+    <Reference Include="GrapeCity.Win.WorkBook.v40, Version=4.0.2007.1225, Culture=neutral, PublicKeyToken=a26afe6ac959b1f8" />
+    <Reference Include="HanbaikanriDialog5_1">
+      <HintPath>\\SCOMSERVER\Development\HanbaiKanri-5_1\Dialog\HanbaikanriDialog5_1.dll</HintPath>
+    </Reference>
+    <Reference Include="HoozinTool_8">
+      <HintPath>E:\風神Ver8Tool\HoozinTool_8.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualC" />
+    <Reference Include="MyControls">
+      <HintPath>\\SCOMSERVER\Development\HanbaiKanri-5_1\DLL\MyControls.dll</HintPath>
+    </Reference>
+    <Reference Include="ShinwaCommonDialog, Version=4.1.2466.25264, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>\\Scomserver\development\Common\Common4\ShinwaCommonDialog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="SystemBit.DBEZip.v20, Version=2.0.2005.1227, Culture=neutral, PublicKeyToken=eb8cf46f8deea2e4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Data.SqlClient" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\ApplicationEvents.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\basMain.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\basCommon.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\basCommonBase.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\CDBCommon.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\CDBUpgrade.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\CDenpyouCommon.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\CFormCommon.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\CPrintCommon.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\CSheetExport.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\CUserSetting.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\DBアクセスクラス\CJisha.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\DBアクセスクラス\CSiireKubun.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\DBアクセスクラス\CUriageKubun.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmDialog.Designer.vb">
+      <DependentUpon>frmDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmPrintForm.Designer.vb">
+      <DependentUpon>frmPrintForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmPrintForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmPrintPreview.Designer.vb">
+      <DependentUpon>frmPrintPreview.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmPrintPreview.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmProgress.Designer.vb">
+      <DependentUpon>frmProgress.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmProgress.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmRestoreSystem.Designer.vb">
+      <DependentUpon>frmRestoreSystem.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmRestoreSystem.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\HelpText.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HelpText.resx</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\SettingsFormSize.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>SettingsFormSize.settings</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmToiawase.Designer.vb">
+      <DependentUpon>frmToiawase.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmToiawase.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisanMeisaiList.Designer.vb">
+      <DependentUpon>frmSeisanMeisaiList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisanMeisaiList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmSystem.designer.vb">
+      <DependentUpon>frmSystem.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmSystem.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Template\frmDenpyouMeisaiList.designer.vb">
+      <DependentUpon>frmDenpyouMeisaiList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Template\frmDenpyouMeisaiList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Template\frmNyuShukkinMeisaiList.Designer.vb">
+      <DependentUpon>frmNyuShukkinMeisaiList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Template\frmNyuShukkinMeisaiList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入管理資料\frmSiireKanriMenu.Designer.vb">
+      <DependentUpon>frmSiireKanriMenu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入管理資料\frmSiireKanriMenu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\支払伝票\frmSiharaiList.Designer.vb">
+      <DependentUpon>frmSiharaiList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\支払伝票\frmSiharaiList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\支払伝票\frmSiharai.Designer.vb">
+      <DependentUpon>frmSiharai.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\支払伝票\frmSiharai.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\発注伝票\CHattyuPrint.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\発注伝票\frmHattyuList.Designer.vb">
+      <DependentUpon>frmHattyuList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\発注伝票\frmHattyuList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\発注伝票\frmHattyu.Designer.vb">
+      <DependentUpon>frmHattyu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\発注伝票\frmHattyu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmShouhinSuitou.Designer.vb">
+      <DependentUpon>frmShouhinSuitou.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmShouhinSuitou.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmSoukoBetuZaikoList.Designer.vb">
+      <DependentUpon>frmSoukoBetuZaikoList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmSoukoBetuZaikoList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmZaikoList.Designer.vb">
+      <DependentUpon>frmZaikoList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmZaikoList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\棚卸\frmTanaorosi.Designer.vb">
+      <DependentUpon>frmTanaorosi.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\棚卸\frmTanaorosi.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisanList.Designer.vb">
+      <DependentUpon>frmSeisanList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisanList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisan.Designer.vb">
+      <DependentUpon>frmSeisan.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入伝票\frmSiireList.designer.vb">
+      <DependentUpon>frmSiireList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入伝票\frmSiireList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入伝票\frmSiire.designer.vb">
+      <DependentUpon>frmSiire.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入伝票\frmSiire.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\入出庫伝票\frmNyuShukkoList.designer.vb">
+      <DependentUpon>frmNyuShukkoList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\入出庫伝票\frmNyuShukkoList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\入出庫伝票\frmNyuShukko.designer.vb">
+      <DependentUpon>frmNyuShukko.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\入出庫伝票\frmNyuShukko.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\予算\frmYosan.Designer.vb">
+      <DependentUpon>frmYosan.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\予算\frmYosan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaIkkatu.Designer.vb">
+      <DependentUpon>frmAtenaIkkatu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaIkkatu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaInput.Designer.vb">
+      <DependentUpon>frmAtenaInput.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaInput.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaLabel.Designer.vb">
+      <DependentUpon>frmAtenaLabel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaLabel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\入金処理\frmNyukinList.Designer.vb">
+      <DependentUpon>frmNyukinList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\入金処理\frmNyukinList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\入金処理\frmNyukin.Designer.vb">
+      <DependentUpon>frmNyukin.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\入金処理\frmNyukin.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJutyuList.Designer.vb">
+      <DependentUpon>frmJutyuList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJutyuList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJuHattyuList.Designer.vb">
+      <DependentUpon>frmJuHattyuList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJuHattyuList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJuHattyuMeisaiList.Designer.vb">
+      <DependentUpon>frmJuHattyuMeisaiList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJuHattyuMeisaiList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJutyu.Designer.vb">
+      <DependentUpon>frmJutyu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJutyu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\CMotochouPrint.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochouList.Designer.vb">
+      <DependentUpon>frmMotochouList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochouList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochou.Designer.vb">
+      <DependentUpon>frmMotochou.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochou.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmEnvironment.designer.vb">
+      <DependentUpon>frmEnvironment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmEnvironment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochouPrint.designer.vb">
+      <DependentUpon>frmMotochouPrint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochouPrint.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmMikaishuList.Designer.vb">
+      <DependentUpon>frmMikaishuList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmMikaishuList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinKubunList.Designer.vb">
+      <DependentUpon>frmNyuShukkinKubunList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinKubunList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinList.Designer.vb">
+      <DependentUpon>frmNyuShukkinList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinYoteiList.Designer.vb">
+      <DependentUpon>frmNyuShukkinYoteiList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinYoteiList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmShouhinTokuiUriage.Designer.vb">
+      <DependentUpon>frmShouhinTokuiUriage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmShouhinTokuiUriage.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmTegataList.Designer.vb">
+      <DependentUpon>frmTegataList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmTegataList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageJuniList.Designer.vb">
+      <DependentUpon>frmUriageJuniList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageJuniList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageKanriMenu.Designer.vb">
+      <DependentUpon>frmUriageKanriMenu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageKanriMenu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireIchiran.Designer.vb">
+      <DependentUpon>frmUriageSiireIchiran.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireIchiran.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireIchiranDetail.Designer.vb">
+      <DependentUpon>frmUriageSiireIchiranDetail.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireIchiranDetail.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireMeisai.Designer.vb">
+      <DependentUpon>frmUriageSiireMeisai.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireMeisai.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireNikkei.Designer.vb">
+      <DependentUpon>frmUriageSiireNikkei.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireNikkei.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireSuiiGraph.Designer.vb">
+      <DependentUpon>frmUriageSiireSuiiGraph.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireSuiiGraph.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireSuiiList.Designer.vb">
+      <DependentUpon>frmUriageSiireSuiiList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireSuiiList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmYosanSuiiList.Designer.vb">
+      <DependentUpon>frmYosanSuiiList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmYosanSuiiList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\CNouhin.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\CNouhinDenpyouPrint.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\CNouhinPrintSet.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhin.Designer.vb">
+      <DependentUpon>frmNouhin.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhin.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhinList.designer.vb">
+      <DependentUpon>frmNouhinList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhinList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\CSetting.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmMenu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmMenu.Designer.vb">
+      <DependentUpon>frmMenu.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmSplashScreen.Designer.vb">
+      <DependentUpon>frmSplashScreen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmSplashScreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\My Project\AssemblyInfo.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmJisha.Designer.vb">
+      <DependentUpon>frmJisha.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmJisha.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\CMitumoriPrint.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriList.Designer.vb">
+      <DependentUpon>frmMitumoriList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumori.Designer.vb">
+      <DependentUpon>frmMitumori.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumori.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriU.Designer.vb">
+      <DependentUpon>frmMitumoriU.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriU.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriUchiwake.Designer.vb">
+      <DependentUpon>frmMitumoriUchiwake.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriUchiwake.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\CMotochou.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\CSeikyuSho.vb" />
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuKobetsu.Designer.vb">
+      <DependentUpon>frmSeikyuKobetsu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuKobetsu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuList.Designer.vb">
+      <DependentUpon>frmSeikyuList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuIkkatsu.Designer.vb">
+      <DependentUpon>frmSeikyuIkkatsu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuIkkatsu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuMenu.Designer.vb">
+      <DependentUpon>frmSeikyuMenu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuMenu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuRireki.Designer.vb">
+      <DependentUpon>frmSeikyuRireki.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuRireki.vb">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmDialog.resx">
+      <DependentUpon>frmDialog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmPrintForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPrintForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmPrintPreview.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmPrintPreview.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmProgress.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmProgress.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\frmRestoreSystem.resx">
+      <DependentUpon>frmRestoreSystem.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\HelpText.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>HelpText.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmToiawase.resx">
+      <DependentUpon>frmToiawase.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisanMeisaiList.resx">
+      <DependentUpon>frmSeisanMeisaiList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmSystem.resx">
+      <DependentUpon>frmSystem.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmMenu.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmMenu.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\frmSplashScreen.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSplashScreen.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\My Project\licenses.licx" />
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Template\frmDenpyouMeisaiList.resx">
+      <DependentUpon>frmDenpyouMeisaiList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Template\frmNyuShukkinMeisaiList.resx">
+      <DependentUpon>frmNyuShukkinMeisaiList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入管理資料\frmSiireKanriMenu.resx">
+      <DependentUpon>frmSiireKanriMenu.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\支払伝票\frmSiharaiList.resx">
+      <DependentUpon>frmSiharaiList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\支払伝票\frmSiharai.resx">
+      <DependentUpon>frmSiharai.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\発注伝票\frmHattyuList.resx">
+      <DependentUpon>frmHattyuList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\発注伝票\frmHattyu.resx">
+      <DependentUpon>frmHattyu.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmShouhinSuitou.resx">
+      <DependentUpon>frmShouhinSuitou.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmSoukoBetuZaikoList.resx">
+      <DependentUpon>frmSoukoBetuZaikoList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\在庫管理資料\frmZaikoList.resx">
+      <DependentUpon>frmZaikoList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\棚卸\frmTanaorosi.resx">
+      <DependentUpon>frmTanaorosi.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisanList.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSeisanList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\生産伝票\frmSeisan.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSeisan.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入伝票\frmSiireList.resx">
+      <DependentUpon>frmSiireList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\仕入\仕入伝票\frmSiire.resx">
+      <DependentUpon>frmSiire.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\入出庫伝票\frmNyuShukkoList.resx">
+      <DependentUpon>frmNyuShukkoList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\在庫管理\入出庫伝票\frmNyuShukko.resx">
+      <DependentUpon>frmNyuShukko.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\予算\frmYosan.resx">
+      <DependentUpon>frmYosan.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaIkkatu.resx">
+      <DependentUpon>frmAtenaIkkatu.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaInput.resx">
+      <DependentUpon>frmAtenaInput.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\宛名印刷\frmAtenaLabel.resx">
+      <DependentUpon>frmAtenaLabel.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\入金処理\frmNyukinList.resx">
+      <DependentUpon>frmNyukinList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\入金処理\frmNyukin.resx">
+      <DependentUpon>frmNyukin.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJutyuList.resx">
+      <DependentUpon>frmJutyuList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJuHattyuList.resx">
+      <DependentUpon>frmJuHattyuList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJuHattyuMeisaiList.resx">
+      <DependentUpon>frmJuHattyuMeisaiList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\受注伝票\frmJutyu.resx">
+      <DependentUpon>frmJutyu.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochouList.resx">
+      <DependentUpon>frmMotochouList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochou.resx">
+      <DependentUpon>frmMotochou.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmEnvironment.resx">
+      <DependentUpon>frmEnvironment.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上元帳\frmMotochouPrint.resx">
+      <DependentUpon>frmMotochouPrint.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmMikaishuList.resx">
+      <DependentUpon>frmMikaishuList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinKubunList.resx">
+      <DependentUpon>frmNyuShukkinKubunList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinList.resx">
+      <DependentUpon>frmNyuShukkinList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmNyuShukkinYoteiList.resx">
+      <DependentUpon>frmNyuShukkinYoteiList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmShouhinTokuiUriage.resx">
+      <DependentUpon>frmShouhinTokuiUriage.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmTegataList.resx">
+      <DependentUpon>frmTegataList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageJuniList.resx">
+      <DependentUpon>frmUriageJuniList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageKanriMenu.resx">
+      <DependentUpon>frmUriageKanriMenu.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireIchiran.resx">
+      <DependentUpon>frmUriageSiireIchiran.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireIchiranDetail.resx">
+      <DependentUpon>frmUriageSiireIchiranDetail.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireMeisai.resx">
+      <DependentUpon>frmUriageSiireMeisai.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireNikkei.resx">
+      <DependentUpon>frmUriageSiireNikkei.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireSuiiGraph.resx">
+      <DependentUpon>frmUriageSiireSuiiGraph.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmUriageSiireSuiiList.resx">
+      <DependentUpon>frmUriageSiireSuiiList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\売上管理資料\frmYosanSuiiList.resx">
+      <DependentUpon>frmYosanSuiiList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhin.resx">
+      <DependentUpon>frmNouhin.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\納品伝票\frmNouhinList.resx">
+      <DependentUpon>frmNouhinList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\frmJisha.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmJisha.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriList.resx">
+      <DependentUpon>frmMitumoriList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumori.resx">
+      <DependentUpon>frmMitumori.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriU.resx">
+      <DependentUpon>frmMitumoriU.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\見積書\frmMitumoriUchiwake.resx">
+      <DependentUpon>frmMitumoriUchiwake.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuKobetsu.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSeikyuKobetsu.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuList.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSeikyuList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuIkkatsu.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSeikyuIkkatsu.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuMenu.resx">
+      <DependentUpon>frmSeikyuMenu.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売\請求書\frmSeikyuRireki.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSeikyuRireki.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Common\SettingsFormSize.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>SettingsFormSize.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\販売管理5_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="ADODB">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="GrapeCity.Excel">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="GrapeCity.Win.BaseGrid.v40">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="GrapeCity.Win.Input.Postal.v40">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="GrapeCity.Win.Input.v40">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="GrapeCity.Win.MultiRow.v40">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="GrapeCity.Win.WorkBook.v40">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="ja\GrapeCity.Win.BaseGrid.v40.resources">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Satellite</FileType>
+    </PublishFile>
+    <PublishFile Include="ja\GrapeCity.Win.Input.v40.resources">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Satellite</FileType>
+    </PublishFile>
+    <PublishFile Include="ja\GrapeCity.Win.MultiRow.v40.resources">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Satellite</FileType>
+    </PublishFile>
+    <PublishFile Include="ja\GrapeCity.Win.WorkBook.v40.resources">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Satellite</FileType>
+    </PublishFile>
+    <PublishFile Include="SystemBit.DBEZip.v20">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6 %28x86 および x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows インストーラー 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\販売管理5.ico" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\text-files-2-48_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\resize2-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\search-add-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\list-2-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\info-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\view-details-48_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\view-details-32_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\view-details-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\undo-3-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\stop-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\send-file-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\search-3-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\save-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\refresh-2-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\printer-32_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\printer-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\plus-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\paper-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\ok-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\logout-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\login-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\list-ingredients-48_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\invoice-48_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\info-16_FFFFFF.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\help-16_FFFFFF.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\gear-2-48_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\file-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\eraser-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\edit-property-48_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\downloading-updates-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\document-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\add-row-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-29-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-32-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-93-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-97-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-178-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-240-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-left-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-right-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\available-updates-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\bill-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\bill-48_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\cancel-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\checked-checkbox-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\checked-checkboxOff-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\close-window-16-B22222.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\copy-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\database-5-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\data-configuration-48_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\delete-2-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\delete-row-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\day-view2-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\StatusWarning.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\StatusInvalid_16x.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\invoice-add-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\invoice-edit-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\list-ingredients-printer-48_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\list-ingredients-printer-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\bar-chart-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\gear-2-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\line-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\paint-bucket-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\computer-16_FFFFFF.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\user-4-16_FFFFFF.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-37-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\help-16_307EA9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\undo-4-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-186-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\arrow-189-16_307EA9.png" />
+    <None Include="HanbaikanriTEST_Base-B\Base-B\Base-B\Resources\sigma-16.png" />
+    <Content Include="HanbaikanriTEST_Base-B\Base-B\Base-B\環境設定\HK5_ServiceControl.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Customize\販売\納品伝票\" />
+    <Folder Include="My Project\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
